@@ -7,7 +7,7 @@ const RangeMarketCard = ({ market ,setShowRangeModal,setSelectSingleRangeMarket}
       <div
         className="bg-gradient-to-br from-yellow-300 to-orange-400 rounded-3xl p-6 shadow-xl hover:scale-105 transition-transform font-techno text-black flex flex-col justify-between h-[550px]" // Fixed height
       >
-        <div className="text-white/80 h-[300px] rounded-md overflow-y-auto text-xs mb-4">
+        <div className="text-white/80 h-[400px] rounded-md overflow-y-auto text-xs mb-4">
           <XEmbed
             style={{ borderRadius: "0px", height: "100%" }}
             url={market.url}
