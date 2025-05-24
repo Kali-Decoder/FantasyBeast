@@ -43,6 +43,21 @@ struct PoolState {
     status: PoolStatus,
 }
 
+// Struct to return pool info with ID
+#[derive(Copy, Drop, Serde, starknet::Store)]
+struct PoolInfo {
+    pool_id: u32,
+    creator: starknet::ContractAddress,
+    question: felt252,
+    start_time: u64,
+    end_time: u64,
+    max_bettors: u32,
+    total_bets: u32,
+    total_amount: u256,
+    actual_result: u256,
+    status: PoolStatus,
+}
+
 // Struct to return prediction info
 #[derive(Copy, Drop, Serde, starknet::Store)]
 struct PredictionInfo {
@@ -69,6 +84,8 @@ pub trait IPredictionMarket<TContractState> {
     fn claim_reward(ref self: TContractState, pool_id: u32);
     fn get_pool(self: @TContractState, pool_id: u32) -> PoolState;
     fn get_prediction(self: @TContractState, pool_id: u32, prediction_id: u32) -> PredictionInfo;
+    fn get_all_pools(self: @TContractState) -> Array<PoolInfo>;
+    fn get_pools_count(self: @TContractState) -> u32;
 }
 
 #[starknet::contract]
@@ -78,7 +95,7 @@ mod Buzzify {
         Map, StoragePathEntry, StoragePointerReadAccess, StoragePointerWriteAccess,
     };
     use starknet::{ContractAddress, get_block_timestamp, get_caller_address, get_contract_address};
-    use super::{Pool, PoolState, PoolStatus, Prediction, PredictionInfo};
+    use super::{Pool, PoolState, PoolStatus, Prediction, PredictionInfo, PoolInfo};
 
     #[storage]
     struct Storage {
@@ -380,6 +397,36 @@ mod Buzzify {
                 bet_amount: prediction.bet_amount,
                 claimed: prediction.claimed,
             }
+        }
+
+        fn get_all_pools(self: @ContractState) -> Array<PoolInfo> {
+            let total_pools = self.pools_len.read();
+            let mut pools_array: Array<PoolInfo> = array![];
+            let mut i: u32 = 0;
+
+            while i < total_pools {
+                let pool = self.pools.entry(i).read();
+                let pool_info = PoolInfo {
+                    pool_id: i,
+                    creator: pool.creator,
+                    question: pool.question,
+                    start_time: pool.start_time,
+                    end_time: pool.end_time,
+                    max_bettors: pool.max_bettors,
+                    total_bets: pool.total_bets,
+                    total_amount: pool.total_amount,
+                    actual_result: pool.actual_result,
+                    status: pool.status,
+                };
+                pools_array.append(pool_info);
+                i += 1;
+            }
+
+            pools_array
+        }
+
+        fn get_pools_count(self: @ContractState) -> u32 {
+            self.pools_len.read()
         }
     }
 

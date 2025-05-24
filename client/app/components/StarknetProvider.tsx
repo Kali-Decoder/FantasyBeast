@@ -1,12 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
-  useConnect,
-  useDisconnect,
-  useAccount,
-  useProvider,
+
   argent,
   braavos,
   Connector,
@@ -20,10 +17,9 @@ import { constants } from "starknet";
 
 import { ArgentMobileConnector } from "starknetkit/argentMobile";
 import { WebWalletConnector } from "starknetkit/webwallet";
-import { RANGE_BASED_MARKET, STRK_TOKEN_ADDRESS } from "../constants";
+import { RANGE_BASED_MARKET } from "../constants";
 
 const CONTRACT_ADDRESS = RANGE_BASED_MARKET;
-const StarkTokenAddress = STRK_TOKEN_ADDRESS;
 
 const policies = {
   contracts: {
@@ -55,72 +51,6 @@ const customProvider = jsonRpcProvider({
     }
   },
 });
-
-const StarknetContext = createContext<any | null>(null);
-
-export const useStarknetContext = () => {
-  const context = useContext(StarknetContext);
-  if (!context) {
-    throw new Error(
-      "useStarknetContext must be used within a StarknetProvider"
-    );
-  }
-  return context;
-};
-
-const StarknetContextProvider: React.FC<{ children: React.ReactNode }> = ({
-  children,
-}) => {
-  const { connect, connectors } = useConnect();
-  const { disconnect } = useDisconnect();
-  const { address, isConnected } = useAccount();
-  const provider = useProvider();
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const handleConnect = async (connector: any) => {
-    try {
-      setIsLoading(true);
-      setError(null);
-      await connect({ connector });
-    } catch (err) {
-      console.error("Connection error:", err);
-      setError(err instanceof Error ? err.message : String(err));
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleDisconnect = async () => {
-    try {
-      setIsLoading(true);
-      setError(null);
-      await disconnect();
-    } catch (err) {
-      console.error("Disconnection error:", err);
-      setError(err instanceof Error ? err.message : String(err));
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const value = {
-    connect: handleConnect,
-    disconnect: handleDisconnect,
-    connectors,
-    account: provider,
-    connected: isConnected,
-    address,
-    isLoading,
-    error,
-  };
-
-  return (
-    <StarknetContext.Provider value={value}>
-      {children}
-    </StarknetContext.Provider>
-  );
-};
 
 export const StarknetProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
@@ -177,7 +107,7 @@ export const StarknetProvider: React.FC<{ children: React.ReactNode }> = ({
       connectors={allConnectors}
       explorer={voyager}
     >
-      <StarknetContextProvider>{children}</StarknetContextProvider>
+      {children}
     </StarknetConfig>
   );
 };
