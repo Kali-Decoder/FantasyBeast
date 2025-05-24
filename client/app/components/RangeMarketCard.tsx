@@ -1,7 +1,7 @@
 import React from "react";
 import { XEmbed } from "react-social-media-embed";
 
-const RangeMarketCard = ({ market }) => {
+const RangeMarketCard = ({ market ,setShowRangeModal,setSelectSingleRangeMarket}) => {
   return (
     <>
       <div
@@ -35,7 +35,10 @@ const RangeMarketCard = ({ market }) => {
           </div>
         </div>
 
-        <button className="mt-6 w-full text-white bg-black py-3 rounded-xl hover:bg-white hover:text-black transition-all font-bold tracking-wide active:translate-y-[2px] active:shadow-[2px_2px_0px_rgba(0,0,0,0.8)] shadow-[4px_4px_0px_rgba(0,0,0,1)] border-2 border-black">
+        <button onClick={()=>{
+            setShowRangeModal(true);
+            setSelectSingleRangeMarket(market);
+        }} className="mt-6 w-full text-white bg-black py-3 rounded-xl hover:bg-white hover:text-black transition-all font-bold tracking-wide active:translate-y-[2px] active:shadow-[2px_2px_0px_rgba(0,0,0,0.8)] shadow-[4px_4px_0px_rgba(0,0,0,1)] border-2 border-black">
           Predict Now
         </button>
       </div>
