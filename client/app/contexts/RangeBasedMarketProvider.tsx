@@ -45,10 +45,6 @@ export function CoinFlipProvider({ children }: CoinFlipProviderProps) {
   const { account, isConnected } = useAccount();
   const [status, setStatus] = useState<Status>("idle");
   const [error, setError] = useState<string | null>(null);
-  const [currentFlip, setCurrentFlip] = useState<FlipDetails | null>(null);
-  const [latestRequestedId, setLatestRequestedId] = useState<string | null>(
-    null
-  );
 
   // Helper to handle errors in a consistent way
   const handleError = useCallback((error: unknown) => {
@@ -244,7 +240,7 @@ export function CoinFlipProvider({ children }: CoinFlipProviderProps) {
         const response = await range_based_contract.get_prediction(
           CallData.compile({
             pool_id: pool_id,
-            prediction_id;prediction_id
+            prediction_id:prediction_id
           })
         );
 

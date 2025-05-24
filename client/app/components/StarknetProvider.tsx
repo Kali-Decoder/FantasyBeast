@@ -20,22 +20,23 @@ import { constants } from "starknet";
 
 import { ArgentMobileConnector } from "starknetkit/argentMobile";
 import { WebWalletConnector } from "starknetkit/webwallet";
-import {
-  RANGE_BASED_MARKET,
-  STRK_TOKEN_ADDRESS,
-} from "../constants";
+import { RANGE_BASED_MARKET, STRK_TOKEN_ADDRESS } from "../constants";
 
 const CONTRACT_ADDRESS = RANGE_BASED_MARKET;
 const StarkTokenAddress = STRK_TOKEN_ADDRESS;
 
-
 const policies = {
   contracts: {
     [CONTRACT_ADDRESS]: {
-      name: "Coin Flip",
-      description: "Allows interaction with the Flappy Bird game contract",
-      methods: [{ name: "Flip Coin", entrypoint: "flip_coin", session: true }],
-    }
+      name: "Fantasy Beast",
+      description: "Allows interaction with the Fantasy Beast Prediction",
+      methods: [
+        { name: "Create Pool", entrypoint: "create_pool", session: true },
+        { name: "Set Result", entrypoint: "set_result", session: true },
+        { name: "Place Bet", entrypoint: "place_bet", session: true },
+        { name: "Claim Reward", entrypoint: "claim_reward", session: true },
+      ],
+    },
   },
 };
 
