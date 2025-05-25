@@ -274,6 +274,22 @@ export function RangeBasedProvider({ children }: RangeBasedProviderProps) {
     }
   };
 
+
+  const getLeaderboard = async () => {
+    try {
+      // if (!address) {
+      //   throw new Error("No address connected");
+      // }
+
+      let data = await getWithHeaders(`/leaderboard`, {
+        "x-user-address": "0xcfa038455b54714821f291814071161c9870B891",
+      });
+      return data?.data || [];
+    } catch (error) {
+      console.error("Error fetching points:", error);
+      return 0; // Return 0 or handle error as needed
+    }
+  };
   const getPoints = async () => {
     try {
       // if (!address) {
@@ -398,6 +414,7 @@ export function RangeBasedProvider({ children }: RangeBasedProviderProps) {
       isConnected,
       transactions,
       userPoints,
+      getLeaderboard
     }),
     [
       createPool,
@@ -412,6 +429,7 @@ export function RangeBasedProvider({ children }: RangeBasedProviderProps) {
       isConnected,
       transactions,
       userPoints,
+      getLeaderboard
     ]
   );
 
