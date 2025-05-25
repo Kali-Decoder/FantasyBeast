@@ -3,11 +3,11 @@ import { useEffect, useState } from "react";
 
 // Card data with image URLs
 const cards = [
-  { title: "Play With Creators", rating: 3.4, image: "https://pbs.twimg.com/media/GnDn5JybQAApbp1?format=jpg&name=large" },
-  { title: "Snake Ladder", rating: 3.4, image: "https://img.freepik.com/premium-vector/snakes-ladders-board-game-template-design-with-forest-background_600323-2431.jpg?w=740" },
-  { title: "Rock Paper Scissor", rating: 3.4, image: "https://img.freepik.com/premium-vector/hand-rock-paper-scissor-clip-art_107355-34.jpg?w=740" },
-  { title: "Mines Game", rating: 3.4, image: "https://img.freepik.com/premium-vector/vector_863384-153.jpg?w=740" },
-  { title: "Roulette", rating: 3.4, image: "https://img.freepik.com/premium-vector/casino-vector-background_87689-85.jpg?w=740" },
+  { title: "@odin_free", rating: 3.4, image: "https://pbs.twimg.com/profile_images/1879901116806164480/olCdoL1D_400x400.jpg" },
+  { title: "@starkience", rating: 3.4, image: "https://pbs.twimg.com/profile_images/1879907075649597440/mbicFQO0_400x400.jpg" },
+  { title: "@akashneelesh", rating: 3.4, image: "https://pbs.twimg.com/profile_images/1881206114395787264/II0n4t6x_400x400.jpg" },
+  { title: "@Yoyo_343_", rating: 3.4, image: "https://pbs.twimg.com/profile_images/1901901517655097344/2S91toQ0_400x400.jpg" },
+  { title: "@reet_batra", rating: 3.4, image: "https://pbs.twimg.com/profile_images/1881112914524000256/txUkIUzJ_400x400.jpg" },
 ];
 
 interface GameCardProps {
@@ -63,9 +63,9 @@ const GameCard = ({ title, rating, image, position }: GameCardProps) => {
       <div className="relative z-10 flex flex-col h-full justify-between p-6">
         <div className="flex justify-between items-start">
           <h3 className="text-2xl font-bold font-techno">{title}</h3>
-          <div className="bg-white/20 backdrop-blur-sm rounded-full px-3 py-1 flex items-center">
-            <span className="text-sm mr-1">⭐</span>
-            <span className="font-bold">{rating}</span>
+          <div className="bg-white/20 backdrop-blur-md rounded-full px-3 py-1 flex items-center">
+            <span className="text-sm mr-1">🏆</span>
+         
           </div>
         </div>
       </div>

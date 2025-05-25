@@ -36,6 +36,7 @@ const RangeMarketCard: React.FC<RangeMarketCardProps> = ({
   };
 
   return (
+
     <div className="bg-gradient-to-br from-yellow-300 to-orange-400 rounded-3xl p-6 shadow-xl hover:scale-105 transition-transform font-techno text-black flex flex-col justify-between h-full min-h-[420px] max-w-md w-full mx-auto">
       
       {/* Embedded content */}

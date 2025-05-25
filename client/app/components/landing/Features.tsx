@@ -1,53 +1,63 @@
-import React from 'react'
+import React from "react";
 
 const Features = () => {
   return (
-    <section
-      className="py-20 px-6 w-full mx-auto font-['Press_Start_2P,_sans-serif'] text-white"
-     
-    >
-      <h2 className="text-3xl md:text-4xl font-bold mb-16 font-techno text-center text-white ">
+    <section className="py-20 px-6 w-full mx-auto font-['Press_Start_2P,_sans-serif'] text-white">
+      <h2 className="text-3xl md:text-4xl font-bold mb-16 font-techno text-center text-white">
         Why Bet on Fantasy Beast?
       </h2>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
         {[
           {
-            color: 'bg-gray-800',
-            title: 'Fast & Low Fees',
-            desc: `Enjoy lightning-fast transactions with minimal gas fees on Starknet's Layer 2.`,
+            color: "bg-gray-800",
+            title: "Regular Users",
+            desc: "Deposit funds, place bets, create markets, and withdraw winnings with ease.",
             icon: (
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 strokeWidth={2}
-                d="M13 10V3L4 14h7v7l9-11h-7z"
+                d="M5 13l4 4L19 7"
               />
             ),
           },
           {
-            color: 'bg-gray-700',
-            title: 'Secure Gaming',
-            desc: `All games are provably fair and verified on-chain using ZK tech.`,
+            color: "bg-gray-700",
+            title: "Market Creators",
+            desc: "Set up custom betting markets by defining events and resolution logic.",
             icon: (
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 strokeWidth={2}
-                d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+                d="M12 4v16m8-8H4"
               />
             ),
           },
           {
-            color: 'bg-gray-600',
-            title: 'Win Tokens',
-            desc: `Earn STARK tokens by completing challenges and climbing the leaderboard.`,
+            color: "bg-gray-600",
+            title: "AI Resolver (zkTLS)",
+            desc: "Autonomously fetches and verifies social media data to resolve markets.",
             icon: (
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 strokeWidth={2}
-                d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                d="M9 12l2 2 4-4m5-3a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            ),
+          },
+          {
+            color: "bg-gray-500",
+            title: "Administrators",
+            desc: "Oversee governance, resolve disputes, and track platform stats (optional).",
+            icon: (
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M3 7h18M3 12h18M3 17h18"
               />
             ),
           },
@@ -69,7 +79,9 @@ const Features = () => {
                 {feature.icon}
               </svg>
             </div>
-            <h3 className="text-lg mb-4 text-red-300 font-mono">{feature.title}</h3>
+            <h3 className="text-lg mb-4 text-red-300 font-mono">
+              {feature.title}
+            </h3>
             <p className="text-sm text-gray-300 leading-relaxed font-mono">
               {feature.desc}
             </p>
@@ -77,7 +89,7 @@ const Features = () => {
         ))}
       </div>
     </section>
-  )
-}
+  );
+};
 
-export default Features
+export default Features;

@@ -58,7 +58,7 @@ const BinaryMarketCard: React.FC<BinaryMarketCardProps> = ({
     <>
       <div className="bg-gradient-to-br from-blue-500 to-purple-500 rounded-3xl p-6 shadow-xl hover:scale-105 transition-transform font-techno text-white flex flex-col justify-between">
         <div className="mb-4">
-          <div className="text-white/80 h-[300px] rounded-md overflow-y-auto text-xs mb-4">
+          <div className="text-white/80 h-[400px] rounded-md overflow-y-auto text-xs mb-4">
             <XEmbed
               style={{ borderRadius: "0px", height: "100%" }}
               url={getEmbedUrl()}
