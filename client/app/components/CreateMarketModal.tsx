@@ -6,6 +6,12 @@ import { useRangeBased } from "../contexts/RangeBasedMarketProvider";
 import { useRangeContract } from "../hooks/useRangeContract";
 import { useAccount, useConnect } from "@starknet-react/core";
 import ControllerConnector from "@cartridge/connector/controller";
+import { useBinaryMarketContract } from "../hooks/useBinaryContract";
+
+export enum Outcome {
+  Yes = 0,
+  No = 1,
+}
 
 export default function CreateMarketModal({ onClose }: any) {
   const { account, isConnected, address } = useAccount();
@@ -19,30 +25,43 @@ export default function CreateMarketModal({ onClose }: any) {
       (c: any) => c instanceof ControllerConnector
     );
     if (controller) {
-      controller
-        ?.username()
-        ?.then((n: React.SetStateAction<string | undefined>) => setUsername(n));
+      controller?.username()?.then((n) => setUsername(n));
       setConnected(true);
     }
   }, [address, connectors]);
 
   const { status, error } = useRangeBased();
   const { createPool } = useRangeContract(connected, account);
+  const { createMarket } = useBinaryMarketContract(connected, account);
+
+  const [marketType, setMarketType] = useState<"range" | "binary">("range");
 
   const [formData, setFormData] = useState({
     question: "",
+    description: "",
     startTime: "",
     endTime: "",
+    resolutionTime: "",
     maxBettors: "",
     amount: "",
+    initialPrediction: Outcome.Yes,
   });
 
-  const handleInputChange = (e: { target: { name: any; value: any } }) => {
+  const handleInputChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
+  ) => {
     const { name, value } = e.target;
+
     setFormData((prev) => ({
       ...prev,
-      [name]: value,
+      [name]: name === "initialPrediction" ? parseInt(value) : value,
     }));
+  };
+
+  const handleMarketTypeChange = (type: "range" | "binary") => {
+    setMarketType(type);
   };
 
   const handleSubmit = async (e: { preventDefault: () => void }) => {
@@ -53,7 +72,6 @@ export default function CreateMarketModal({ onClose }: any) {
       return;
     }
 
-    // Validate form data
     if (!formData.question.trim()) {
       alert("Please enter a market question");
       return;
@@ -86,27 +104,46 @@ export default function CreateMarketModal({ onClose }: any) {
       const endTimestamp = Math.floor(
         new Date(formData.endTime).getTime() / 1000
       );
+      const resolutionTimestamp = formData.resolutionTime
+        ? Math.floor(new Date(formData.resolutionTime).getTime() / 1000)
+        : endTimestamp;
 
-     const data= await createPool(
-        formData.question,
-        startTimestamp,
-        endTimestamp,
-        parseInt(formData.maxBettors),
-        parseFloat(formData.amount)
-      );
+      if (marketType === "range") {
+        const data = await createPool(
+          formData.question,
+          startTimestamp,
+          endTimestamp,
+          parseInt(formData.maxBettors),
+          parseFloat(formData.amount)
+        );
 
-      console.log({data})
+        console.log({ data });
+      } else {
+        const data = await createMarket(
+          formData.question,
+          formData.question,
+          startTimestamp,
+          endTimestamp,
+          resolutionTimestamp,
+          parseInt(formData.maxBettors),
+          parseFloat(formData.amount),
+          formData.initialPrediction
+        );
 
-      
+        console.log({ data });
+      }
 
-      // Reset form and close modal on success
       setFormData({
         question: "",
+        description: "",
         startTime: "",
         endTime: "",
+        resolutionTime: "",
         maxBettors: "",
         amount: "",
+        initialPrediction: Outcome.Yes,
       });
+
       onClose();
     } catch (err) {
       console.error("Failed to create market:", err);
@@ -116,23 +153,70 @@ export default function CreateMarketModal({ onClose }: any) {
   const handleClose = () => {
     setFormData({
       question: "",
+      description: "",
       startTime: "",
       endTime: "",
+      resolutionTime: "",
       maxBettors: "",
       amount: "",
+      initialPrediction: Outcome.Yes,
     });
     onClose();
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50">
-      <div className="bg-[#0d111c] rounded-2xl shadow-lg p-6 w-full max-w-xl text-white space-y-6">
-        {/* Title */}
-        <h2 className="text-2xl font-semibold">Create Prediction Market</h2>
+    <div className="fixed inset-0 bg-black font-techno bg-opacity-60 flex items-center justify-center z-50">
+      <div className="bg-black border border-white rounded-2xl shadow-lg p-6 w-full max-w-xl text-white space-y-6">
+        <h2 className="text-2xl font-semibold text-center">
+          Create Prediction Market
+        </h2>
 
-        {/* Market Question */}
+        {/* Market Type Selection */}
+        <div className="flex gap-6 items-center justify-center text-sm font-medium">
+          <p
+            className={`flex items-center gap-2 cursor-pointer ${
+              marketType === "range" ? "text-green-500" : "text-white"
+            }`}
+            onClick={() => handleMarketTypeChange("range")}
+          >
+            <span className="relative">
+              <input
+                type="radio"
+                name="marketType"
+                value="range"
+                checked={marketType === "range"}
+                onChange={() => handleMarketTypeChange("range")}
+                className="peer hidden"
+              />
+              <span className="w-4 h-4 rounded-full border border-gray-400 peer-checked:border-green-500 peer-checked:bg-green-500 inline-block"></span>
+            </span>
+            Range
+          </p>
+
+          <p
+            className={`flex items-center gap-2 cursor-pointer ${
+              marketType === "binary" ? "text-green-500" : "text-white"
+            }`}
+            onClick={() => handleMarketTypeChange("binary")}
+          >
+            <span className="relative">
+              <input
+                type="radio"
+                name="marketType"
+                value="binary"
+                checked={marketType === "binary"}
+                onChange={() => handleMarketTypeChange("binary")}
+                className="peer hidden"
+              />
+              <span className="w-4 h-4 rounded-full border border-gray-400 peer-checked:border-green-500 peer-checked:bg-green-500 inline-block"></span>
+            </span>
+            Binary
+          </p>
+        </div>
+
+        {/* Question */}
         <div>
-          <label className="text-sm mb-1 block">Prediction Question</label>
+          <p className="text-sm mb-1 block">Prediction Question</p>
           <textarea
             name="question"
             value={formData.question}
@@ -140,7 +224,7 @@ export default function CreateMarketModal({ onClose }: any) {
             rows={2}
             maxLength={200}
             placeholder="What will be the price of ETH on December 31st, 2024?"
-            className="w-full rounded-lg px-4 py-2 bg-[#1a2130] border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+            className="w-full rounded-lg px-4 py-2 bg-gray-950 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
             required
           />
           <div className="text-xs text-gray-400 text-right mt-1">
@@ -148,38 +232,78 @@ export default function CreateMarketModal({ onClose }: any) {
           </div>
         </div>
 
-        {/* Date Range */}
+        {/* Binary Specific Fields */}
+        {marketType === "binary" && (
+          <>
+            {/* <div>
+              <p className="text-sm mb-1 block">Description</p>
+              <textarea
+                name="description"
+                value={formData.description}
+                onChange={handleInputChange}
+                rows={2}
+                maxLength={300}
+                placeholder="Add more context for participants..."
+                className="w-full rounded-lg px-4 py-2 bg-gray-950 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+              />
+            </div> */}
+
+            <div>
+              <p className="text-sm mb-1 block">Resolution Time</p>
+              <input
+                type="datetime-local"
+                name="resolutionTime"
+                value={formData.resolutionTime}
+                onChange={handleInputChange}
+                className="w-full px-4 py-2 rounded-lg bg-gray-950 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+
+            <div>
+              <p className="text-sm mb-1 block">Initial Prediction</p>
+              <select
+                name="initialPrediction"
+                value={formData.initialPrediction}
+                onChange={handleInputChange}
+                className="w-full px-4 py-2 rounded-lg bg-gray-950 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value={Outcome.Yes}>Yes</option>
+                <option value={Outcome.No}>No</option>
+              </select>
+            </div>
+          </>
+        )}
+
+        {/* Timing */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="text-sm mb-1 block">Starts At</label>
+            <p className="text-sm mb-1 block">Starts At</p>
             <input
               type="datetime-local"
               name="startTime"
               value={formData.startTime}
               onChange={handleInputChange}
-              className="w-full px-4 py-2 rounded-lg bg-[#1a2130] border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 rounded-lg bg-gray-950 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
               required
             />
           </div>
           <div>
-            <label className="text-sm mb-1 block">Ends At</label>
+            <p className="text-sm mb-1 block">Ends At</p>
             <input
               type="datetime-local"
               name="endTime"
               value={formData.endTime}
               onChange={handleInputChange}
-              className="w-full px-4 py-2 rounded-lg bg-[#1a2130] border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 rounded-lg bg-gray-950 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
               required
             />
           </div>
         </div>
 
-        {/* Max Bettors and Initial Stake */}
-        <div className="grid grid-cols-2 md:grid-cols-3 text-white  gap-4 items-end">
+        {/* Stake & Participants */}
+        <div className="grid grid-cols-2 md:grid-cols-3 text-white gap-4 items-end">
           <div>
-            <label className="text-sm mb-1 block text-white">
-              Max Participants
-            </label>
+            <p className="text-sm mb-1 block text-white">Max Participants</p>
             <input
               type="number"
               name="maxBettors"
@@ -187,12 +311,12 @@ export default function CreateMarketModal({ onClose }: any) {
               onChange={handleInputChange}
               placeholder="100"
               min="1"
-              className="w-full px-4 py-2 rounded-lg bg-[#1a2130] border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 rounded-lg bg-gray-950 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
               required
             />
           </div>
           <div>
-            <label className="text-sm mb-1 block">Initial Stake</label>
+            <p className="text-sm mb-1 block">Initial Stake</p>
             <input
               type="number"
               name="amount"
@@ -201,7 +325,7 @@ export default function CreateMarketModal({ onClose }: any) {
               placeholder="10.0"
               min="0"
               step="0.01"
-              className="w-full px-4 py-2 rounded-lg bg-[#1a2130] border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 rounded-lg bg-gray-950 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
               required
             />
           </div>
@@ -212,14 +336,13 @@ export default function CreateMarketModal({ onClose }: any) {
           </div>
         </div>
 
-        {/* Error Display */}
+        {/* Error & Connection Info */}
         {error && (
           <div className="bg-red-900/50 border border-red-500/50 rounded-lg p-3">
             <p className="text-red-400 text-sm">{error}</p>
           </div>
         )}
 
-        {/* Connection Warning */}
         {!isConnected && (
           <div className="bg-yellow-900/50 border border-yellow-500/50 rounded-lg p-3">
             <p className="text-yellow-400 text-sm">
@@ -228,7 +351,7 @@ export default function CreateMarketModal({ onClose }: any) {
           </div>
         )}
 
-        {/* Buttons */}
+        {/* Actions */}
         <div className="flex justify-between mt-4">
           <button
             onClick={handleClose}

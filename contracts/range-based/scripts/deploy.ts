@@ -20,8 +20,8 @@ async function main() {
   let sierraCode, casmCode;
 
   try {
-    ({ sierraCode, casmCode } = await getCompiledCode("buzzify_Buzzify"));
-    //  ({ sierraCode, casmCode } = await getCompiledCode("buzzify_BinaryPredictionMarket"));
+    // ({ sierraCode, casmCode } = await getCompiledCode("buzzify_Buzzify"));
+     ({ sierraCode, casmCode } = await getCompiledCode("buzzify_BinaryPredictionMarket"));
     
     // console.log({sierraCode,casmCode})
   } catch (error: any) {
@@ -30,15 +30,15 @@ async function main() {
   }
 
   const myCallData = new CallData(sierraCode.abi);
-  const constructor = myCallData.compile("constructor", {
-    strk_token_address:
-      "0x04718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d",
-  });
+  // const constructor = myCallData.compile("constructor", {
+  //   strk_token_address:
+  //     "0x04718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d",
+  // });
 
-//   const constructor = myCallData.compile("constructor", {
-//   strk_token_address: "0x04718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d",
-//   protocol_fee: 500  // 5% fee (500 basis points) for binary
-// });
+  const constructor = myCallData.compile("constructor", {
+  strk_token_address: "0x04718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d",
+  protocol_fee: 100  // 1% fee (500 basis points) for binary
+});
 
   // console.log({constructor})
   const deployResponse = await account0.declareAndDeploy(

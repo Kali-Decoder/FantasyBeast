@@ -67,6 +67,13 @@ struct BetInfo {
     claimed: bool,
 }
 
+// Struct to return market with ID
+#[derive(Copy, Drop, Serde, starknet::Store)]
+struct MarketWithId {
+    market_id: u32,
+    market_info: MarketInfo,
+}
+
 #[starknet::interface]
 pub trait IBinaryPredictionMarket<TContractState> {
     fn create_market(
@@ -89,6 +96,8 @@ pub trait IBinaryPredictionMarket<TContractState> {
     fn get_bet(self: @TContractState, market_id: u32, bet_id: u32) -> BetInfo;
     fn get_market_odds(self: @TContractState, market_id: u32) -> (u256, u256); // (yes_odds, no_odds)
     fn get_user_bets(self: @TContractState, market_id: u32, user: starknet::ContractAddress) -> Array<u32>;
+    fn get_all_markets(self: @TContractState) -> Array<MarketWithId>;
+    fn get_markets_count(self: @TContractState) -> u32;
 }
 
 #[starknet::contract]
@@ -98,7 +107,7 @@ pub mod BinaryPredictionMarket {
         Map, StoragePathEntry, StoragePointerReadAccess, StoragePointerWriteAccess,
     };
     use starknet::{ContractAddress, get_block_timestamp, get_caller_address, get_contract_address};
-    use super::{BinaryMarket, MarketInfo, MarketStatus, BinaryBet, BetInfo, Outcome};
+    use super::{BinaryMarket, MarketInfo, MarketStatus, BinaryBet, BetInfo, Outcome, MarketWithId};
 
     #[storage]
     struct Storage {
@@ -492,6 +501,45 @@ pub mod BinaryPredictionMarket {
             }
 
             bet_ids
+        }
+
+        fn get_all_markets(self: @ContractState) -> Array<MarketWithId> {
+            let mut markets: Array<MarketWithId> = array![];
+            let total_markets = self.markets_len.read();
+            
+            let mut i: u32 = 0;
+            while i < total_markets {
+                let market = self.markets.entry(i).read();
+                let market_info = MarketInfo {
+                    creator: market.creator,
+                    question: market.question,
+                    description: market.description,
+                    start_time: market.start_time,
+                    end_time: market.end_time,
+                    resolution_time: market.resolution_time,
+                    max_bettors: market.max_bettors,
+                    total_bets: market.total_bets,
+                    yes_amount: market.yes_amount,
+                    no_amount: market.no_amount,
+                    total_amount: market.total_amount,
+                    final_outcome: market.final_outcome,
+                    status: market.status,
+                };
+                
+                let market_with_id = MarketWithId {
+                    market_id: i,
+                    market_info: market_info,
+                };
+                
+                markets.append(market_with_id);
+                i += 1;
+            }
+
+            markets
+        }
+
+        fn get_markets_count(self: @ContractState) -> u32 {
+            self.markets_len.read()
         }
     }
 

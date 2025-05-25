@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 import { useEffect, useState } from "react";
 import BinaryMarketCard from "../components/BinaryMarketCard";
@@ -106,7 +107,7 @@ export default function MarketPage() {
   useEffect(() => {
     filterMarketByType();
   }, [activeTab]);
-  const getButtonClasses = (tab) =>
+  const getButtonClasses = (tab: string) =>
     `flex-1 font-techno py-2 px-4 whitespace-nowrap rounded-xl border-2 border-black shadow-[3px_3px_0px_rgba(0,0,0,1)] active:translate-y-[2px] flex items-center justify-between px-6 ${
       activeTab === tab ? "bg-blue-500 text-white" : "bg-white text-black"
     }`;
@@ -189,7 +190,7 @@ export default function MarketPage() {
       {showRangeModal && (
         <RangeModal
           onClose={() => setShowRangeModal(false)}
-          selectSingleRangeMarket={selectSingleRangeMarket}
+          selectSingleRangeMarket={selectSingleRangeMarket!}
         />
       )}
     </>

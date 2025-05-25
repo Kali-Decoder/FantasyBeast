@@ -614,6 +614,20 @@ export const binaryAbi = [
     ]
   },
   {
+    "type": "struct",
+    "name": "buzzify::MarketWithId",
+    "members": [
+      {
+        "name": "market_id",
+        "type": "core::integer::u32"
+      },
+      {
+        "name": "market_info",
+        "type": "buzzify::MarketInfo"
+      }
+    ]
+  },
+  {
     "type": "interface",
     "name": "buzzify::IBinaryPredictionMarket",
     "items": [
@@ -777,6 +791,28 @@ export const binaryAbi = [
         "outputs": [
           {
             "type": "core::array::Array::<core::integer::u32>"
+          }
+        ],
+        "state_mutability": "view"
+      },
+      {
+        "type": "function",
+        "name": "get_all_markets",
+        "inputs": [],
+        "outputs": [
+          {
+            "type": "core::array::Array::<buzzify::MarketWithId>"
+          }
+        ],
+        "state_mutability": "view"
+      },
+      {
+        "type": "function",
+        "name": "get_markets_count",
+        "inputs": [],
+        "outputs": [
+          {
+            "type": "core::integer::u32"
           }
         ],
         "state_mutability": "view"
@@ -981,8 +1017,9 @@ export const binaryAbi = [
 
 
 
+
 export const range_deployAddress = "0x712fd40927f728066c7df74251b6e73604efb878aa30a9b2ba2df639e5ca4d6"
 
 
-export const binary_deployAddress = "0xc4897c0c128375224f352519c8d0640465542ee2729f0444359ced82ab4f12"
+export const binary_deployAddress = "0x1aba545c908c9b1acd30b94fb847c43795c07ea1054d2e5b765c02925ea6d9e"
 

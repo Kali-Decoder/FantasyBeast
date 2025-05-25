@@ -17,13 +17,12 @@ import { constants } from "starknet";
 
 import { ArgentMobileConnector } from "starknetkit/argentMobile";
 import { WebWalletConnector } from "starknetkit/webwallet";
-import { RANGE_BASED_MARKET } from "../constants";
+import { BINARY_BASED_MARKET, RANGE_BASED_MARKET } from "../constants";
 
-const CONTRACT_ADDRESS = RANGE_BASED_MARKET;
 
 const policies = {
   contracts: {
-    [CONTRACT_ADDRESS]: {
+    [RANGE_BASED_MARKET]: {
       name: "Fantasy Beast",
       description: "Allows interaction with the Fantasy Beast Prediction",
       methods: [
@@ -33,12 +32,22 @@ const policies = {
         { name: "Claim Reward", entrypoint: "claim_reward", session: true },
       ],
     },
+      [BINARY_BASED_MARKET]: {
+      name: "Fantasy Beast Binary",
+      description: "Allows interaction with the Fantasy Beast Prediction",
+      methods: [
+        { name: "Create Pool", entrypoint: "create_market", session: true },
+        { name: "Set Result", entrypoint: "resolve_market", session: true },
+        { name: "Place Bet", entrypoint: "place_bet", session: true },
+        { name: "Claim Reward", entrypoint: "claim_reward", session: true },
+      ],
+    },
   },
 };
 
 const SEPOLIA_RPC_URL = "https://api.cartridge.gg/x/starknet/sepolia";
 const MAINNET_RPC_URL = "https://api.cartridge.gg/x/starknet/mainnet";
-const CURRENT_CHAIN_ID = process.env.NEXT_PUBLIC_CHAIN_ID || "SN_SEPOLIA";
+const CURRENT_CHAIN_ID =  "SN_SEPOLIA";
 
 const customProvider = jsonRpcProvider({
   rpc: (chain) => {
@@ -101,7 +110,7 @@ export const StarknetProvider: React.FC<{ children: React.ReactNode }> = ({
 
   return (
     <StarknetConfig
-      autoConnect
+      autoConnect={true}
       chains={chains}
       provider={customProvider}
       connectors={allConnectors}

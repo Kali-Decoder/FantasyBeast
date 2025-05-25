@@ -6,6 +6,7 @@ import { lookupAddresses } from "@cartridge/controller";
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import toast from "react-hot-toast";
+import { Copy, LogOut } from "lucide-react";
 
 interface AddressProps {
   isMobile?: boolean;
@@ -29,10 +30,14 @@ const Address: React.FC<AddressProps> = ({ isMobile = false }) => {
 
   useEffect(() => {
     (async () => {
-      if (address) {
-        const addressMap = await lookupAddresses([address]);
-        setUserName(addressMap.get(address) || "nikku");
-      }
+      if (!address) return;
+
+      const lowerAddress = address.toLowerCase();
+      const addressMap = await lookupAddresses([lowerAddress]);
+
+      const keyFromMap = [...addressMap.keys()][0];
+
+      setUserName(addressMap.get(keyFromMap) || "nikku");
     })();
   }, [address]);
 
@@ -75,7 +80,7 @@ const Address: React.FC<AddressProps> = ({ isMobile = false }) => {
                   className="p-1 hover:bg-[#D8BFD8] text-black rounded-full transition-colors"
                   title="Copy address"
                 >
-                  ㊢
+                  <Copy size={12} />
                 </button>
 
                 <button
@@ -83,7 +88,7 @@ const Address: React.FC<AddressProps> = ({ isMobile = false }) => {
                   className="p-1 hover:bg-red-200 text-[#D10000] font-medium text-sm rounded-full transition-colors"
                   title="Disconnect"
                 >
-                  Disconnect
+                  <LogOut size={14} />
                   {/* OR use icon instead of text:
                   <LogOut className="w-4 h-4" /> */}
                 </button>

@@ -105,7 +105,7 @@ export const useRangeContract = (connected: boolean, account: any) => {
   const placeBet = useCallback(
     async (pool_id: number, predicted_value: number, bet_amount: number) => {
       if (!connected || !account) {
-        console.warn("Not connected or account is missing");
+       toast.error("Connect your wallet")
         return null;
       }
 
@@ -113,11 +113,12 @@ export const useRangeContract = (connected: boolean, account: any) => {
         toast.error("Bet amount must be greater than zero");
         return null;
       }
+      console.log({pool_id,predicted_value,bet_amount})
 
       const id = toast.loading("Placing bet...");
 
       try {
-        const _amount = BigInt(bet_amount);
+        const _amount = BigInt(String(bet_amount));
         const multiCall = await account.execute([
           {
             contractAddress: STRK_TOKEN_ADDRESS,
@@ -132,8 +133,8 @@ export const useRangeContract = (connected: boolean, account: any) => {
             entrypoint: "place_bet",
             calldata: CallData.compile({
               pool_id,
-              predicted_value,
-              bet_amount,
+              predicted_value:cairo.uint256(predicted_value),
+              bet_amount: cairo.uint256(bet_amount),
             }),
           },
         ]);
@@ -153,8 +154,7 @@ export const useRangeContract = (connected: boolean, account: any) => {
 
         let betInfo = null;
         if (betPlacedEvent?.data) {
-          // Extract relevant bet information from event data
-          // Adjust indices based on your contract's event structure
+          console.log(betPlacedEvent?.data)
           betInfo = {
             poolId: betPlacedEvent.data[0]?.toString(),
             predictionId: betPlacedEvent.data[1]?.toString(),

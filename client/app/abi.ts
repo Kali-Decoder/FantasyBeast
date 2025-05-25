@@ -893,3 +893,551 @@ export const Range_Market_Abi:Abi = [
     ]
   }
 ]
+
+export const Binary_Market_Abi:Abi = [
+  {
+    "type": "impl",
+    "name": "BinaryPredictionMarketImpl",
+    "interface_name": "buzzify::IBinaryPredictionMarket"
+  },
+  {
+    "type": "struct",
+    "name": "core::integer::u256",
+    "members": [
+      {
+        "name": "low",
+        "type": "core::integer::u128"
+      },
+      {
+        "name": "high",
+        "type": "core::integer::u128"
+      }
+    ]
+  },
+  {
+    "type": "enum",
+    "name": "buzzify::Outcome",
+    "variants": [
+      {
+        "name": "Yes",
+        "type": "()"
+      },
+      {
+        "name": "No",
+        "type": "()"
+      }
+    ]
+  },
+  {
+    "type": "enum",
+    "name": "buzzify::MarketStatus",
+    "variants": [
+      {
+        "name": "Active",
+        "type": "()"
+      },
+      {
+        "name": "Ended",
+        "type": "()"
+      },
+      {
+        "name": "Settled",
+        "type": "()"
+      }
+    ]
+  },
+  {
+    "type": "struct",
+    "name": "buzzify::MarketInfo",
+    "members": [
+      {
+        "name": "creator",
+        "type": "core::starknet::contract_address::ContractAddress"
+      },
+      {
+        "name": "question",
+        "type": "core::felt252"
+      },
+      {
+        "name": "description",
+        "type": "core::felt252"
+      },
+      {
+        "name": "start_time",
+        "type": "core::integer::u64"
+      },
+      {
+        "name": "end_time",
+        "type": "core::integer::u64"
+      },
+      {
+        "name": "resolution_time",
+        "type": "core::integer::u64"
+      },
+      {
+        "name": "max_bettors",
+        "type": "core::integer::u32"
+      },
+      {
+        "name": "total_bets",
+        "type": "core::integer::u32"
+      },
+      {
+        "name": "yes_amount",
+        "type": "core::integer::u256"
+      },
+      {
+        "name": "no_amount",
+        "type": "core::integer::u256"
+      },
+      {
+        "name": "total_amount",
+        "type": "core::integer::u256"
+      },
+      {
+        "name": "final_outcome",
+        "type": "buzzify::Outcome"
+      },
+      {
+        "name": "status",
+        "type": "buzzify::MarketStatus"
+      }
+    ]
+  },
+  {
+    "type": "enum",
+    "name": "core::bool",
+    "variants": [
+      {
+        "name": "False",
+        "type": "()"
+      },
+      {
+        "name": "True",
+        "type": "()"
+      }
+    ]
+  },
+  {
+    "type": "struct",
+    "name": "buzzify::BetInfo",
+    "members": [
+      {
+        "name": "bettor",
+        "type": "core::starknet::contract_address::ContractAddress"
+      },
+      {
+        "name": "prediction",
+        "type": "buzzify::Outcome"
+      },
+      {
+        "name": "bet_amount",
+        "type": "core::integer::u256"
+      },
+      {
+        "name": "claimed",
+        "type": "core::bool"
+      }
+    ]
+  },
+  {
+    "type": "struct",
+    "name": "buzzify::MarketWithId",
+    "members": [
+      {
+        "name": "market_id",
+        "type": "core::integer::u32"
+      },
+      {
+        "name": "market_info",
+        "type": "buzzify::MarketInfo"
+      }
+    ]
+  },
+  {
+    "type": "interface",
+    "name": "buzzify::IBinaryPredictionMarket",
+    "items": [
+      {
+        "type": "function",
+        "name": "create_market",
+        "inputs": [
+          {
+            "name": "question",
+            "type": "core::felt252"
+          },
+          {
+            "name": "description",
+            "type": "core::felt252"
+          },
+          {
+            "name": "start_time",
+            "type": "core::integer::u64"
+          },
+          {
+            "name": "end_time",
+            "type": "core::integer::u64"
+          },
+          {
+            "name": "resolution_time",
+            "type": "core::integer::u64"
+          },
+          {
+            "name": "max_bettors",
+            "type": "core::integer::u32"
+          },
+          {
+            "name": "initial_stake",
+            "type": "core::integer::u256"
+          },
+          {
+            "name": "initial_prediction",
+            "type": "buzzify::Outcome"
+          }
+        ],
+        "outputs": [
+          {
+            "type": "core::integer::u32"
+          }
+        ],
+        "state_mutability": "external"
+      },
+      {
+        "type": "function",
+        "name": "place_bet",
+        "inputs": [
+          {
+            "name": "market_id",
+            "type": "core::integer::u32"
+          },
+          {
+            "name": "prediction",
+            "type": "buzzify::Outcome"
+          },
+          {
+            "name": "bet_amount",
+            "type": "core::integer::u256"
+          }
+        ],
+        "outputs": [],
+        "state_mutability": "external"
+      },
+      {
+        "type": "function",
+        "name": "resolve_market",
+        "inputs": [
+          {
+            "name": "market_id",
+            "type": "core::integer::u32"
+          },
+          {
+            "name": "final_outcome",
+            "type": "buzzify::Outcome"
+          }
+        ],
+        "outputs": [],
+        "state_mutability": "external"
+      },
+      {
+        "type": "function",
+        "name": "claim_reward",
+        "inputs": [
+          {
+            "name": "market_id",
+            "type": "core::integer::u32"
+          }
+        ],
+        "outputs": [],
+        "state_mutability": "external"
+      },
+      {
+        "type": "function",
+        "name": "get_market",
+        "inputs": [
+          {
+            "name": "market_id",
+            "type": "core::integer::u32"
+          }
+        ],
+        "outputs": [
+          {
+            "type": "buzzify::MarketInfo"
+          }
+        ],
+        "state_mutability": "view"
+      },
+      {
+        "type": "function",
+        "name": "get_bet",
+        "inputs": [
+          {
+            "name": "market_id",
+            "type": "core::integer::u32"
+          },
+          {
+            "name": "bet_id",
+            "type": "core::integer::u32"
+          }
+        ],
+        "outputs": [
+          {
+            "type": "buzzify::BetInfo"
+          }
+        ],
+        "state_mutability": "view"
+      },
+      {
+        "type": "function",
+        "name": "get_market_odds",
+        "inputs": [
+          {
+            "name": "market_id",
+            "type": "core::integer::u32"
+          }
+        ],
+        "outputs": [
+          {
+            "type": "(core::integer::u256, core::integer::u256)"
+          }
+        ],
+        "state_mutability": "view"
+      },
+      {
+        "type": "function",
+        "name": "get_user_bets",
+        "inputs": [
+          {
+            "name": "market_id",
+            "type": "core::integer::u32"
+          },
+          {
+            "name": "user",
+            "type": "core::starknet::contract_address::ContractAddress"
+          }
+        ],
+        "outputs": [
+          {
+            "type": "core::array::Array::<core::integer::u32>"
+          }
+        ],
+        "state_mutability": "view"
+      },
+      {
+        "type": "function",
+        "name": "get_all_markets",
+        "inputs": [],
+        "outputs": [
+          {
+            "type": "core::array::Array::<buzzify::MarketWithId>"
+          }
+        ],
+        "state_mutability": "view"
+      },
+      {
+        "type": "function",
+        "name": "get_markets_count",
+        "inputs": [],
+        "outputs": [
+          {
+            "type": "core::integer::u32"
+          }
+        ],
+        "state_mutability": "view"
+      }
+    ]
+  },
+  {
+    "type": "constructor",
+    "name": "constructor",
+    "inputs": [
+      {
+        "name": "strk_token_address",
+        "type": "core::starknet::contract_address::ContractAddress"
+      },
+      {
+        "name": "protocol_fee",
+        "type": "core::integer::u16"
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "buzzify::BinaryPredictionMarket::MarketCreated",
+    "kind": "struct",
+    "members": [
+      {
+        "name": "market_id",
+        "type": "core::integer::u32",
+        "kind": "data"
+      },
+      {
+        "name": "creator",
+        "type": "core::starknet::contract_address::ContractAddress",
+        "kind": "data"
+      },
+      {
+        "name": "question",
+        "type": "core::felt252",
+        "kind": "data"
+      },
+      {
+        "name": "description",
+        "type": "core::felt252",
+        "kind": "data"
+      },
+      {
+        "name": "start_time",
+        "type": "core::integer::u64",
+        "kind": "data"
+      },
+      {
+        "name": "end_time",
+        "type": "core::integer::u64",
+        "kind": "data"
+      },
+      {
+        "name": "resolution_time",
+        "type": "core::integer::u64",
+        "kind": "data"
+      },
+      {
+        "name": "max_bettors",
+        "type": "core::integer::u32",
+        "kind": "data"
+      },
+      {
+        "name": "initial_stake",
+        "type": "core::integer::u256",
+        "kind": "data"
+      },
+      {
+        "name": "initial_prediction",
+        "type": "buzzify::Outcome",
+        "kind": "data"
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "buzzify::BinaryPredictionMarket::BetPlaced",
+    "kind": "struct",
+    "members": [
+      {
+        "name": "market_id",
+        "type": "core::integer::u32",
+        "kind": "data"
+      },
+      {
+        "name": "bet_id",
+        "type": "core::integer::u32",
+        "kind": "data"
+      },
+      {
+        "name": "bettor",
+        "type": "core::starknet::contract_address::ContractAddress",
+        "kind": "data"
+      },
+      {
+        "name": "prediction",
+        "type": "buzzify::Outcome",
+        "kind": "data"
+      },
+      {
+        "name": "bet_amount",
+        "type": "core::integer::u256",
+        "kind": "data"
+      },
+      {
+        "name": "yes_total",
+        "type": "core::integer::u256",
+        "kind": "data"
+      },
+      {
+        "name": "no_total",
+        "type": "core::integer::u256",
+        "kind": "data"
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "buzzify::BinaryPredictionMarket::MarketResolved",
+    "kind": "struct",
+    "members": [
+      {
+        "name": "market_id",
+        "type": "core::integer::u32",
+        "kind": "data"
+      },
+      {
+        "name": "final_outcome",
+        "type": "buzzify::Outcome",
+        "kind": "data"
+      },
+      {
+        "name": "total_amount",
+        "type": "core::integer::u256",
+        "kind": "data"
+      },
+      {
+        "name": "winning_amount",
+        "type": "core::integer::u256",
+        "kind": "data"
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "buzzify::BinaryPredictionMarket::RewardClaimed",
+    "kind": "struct",
+    "members": [
+      {
+        "name": "market_id",
+        "type": "core::integer::u32",
+        "kind": "data"
+      },
+      {
+        "name": "bet_id",
+        "type": "core::integer::u32",
+        "kind": "data"
+      },
+      {
+        "name": "bettor",
+        "type": "core::starknet::contract_address::ContractAddress",
+        "kind": "data"
+      },
+      {
+        "name": "reward_amount",
+        "type": "core::integer::u256",
+        "kind": "data"
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "buzzify::BinaryPredictionMarket::Event",
+    "kind": "enum",
+    "variants": [
+      {
+        "name": "MarketCreated",
+        "type": "buzzify::BinaryPredictionMarket::MarketCreated",
+        "kind": "nested"
+      },
+      {
+        "name": "BetPlaced",
+        "type": "buzzify::BinaryPredictionMarket::BetPlaced",
+        "kind": "nested"
+      },
+      {
+        "name": "MarketResolved",
+        "type": "buzzify::BinaryPredictionMarket::MarketResolved",
+        "kind": "nested"
+      },
+      {
+        "name": "RewardClaimed",
+        "type": "buzzify::BinaryPredictionMarket::RewardClaimed",
+        "kind": "nested"
+      }
+    ]
+  }
+]
