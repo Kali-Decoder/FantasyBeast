@@ -19,7 +19,7 @@
     "@playwright/test": "^1.49.1",
     "@starknet-react/chains": "^3.1.2",
     "@starknet-react/core": "^3.7.2",
-    "axios": "^1.7.9",
+    "axios": "^1.9.0",
     "buzz": "^1.2.1",
     "dotenv": "^16.4.7",
     "form-data": "^4.0.1",

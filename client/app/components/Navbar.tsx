@@ -6,12 +6,13 @@ import { useAccount, useConnect, useDisconnect } from "@starknet-react/core";
 import ControllerConnector from "@cartridge/connector/controller";
 import Link from "next/link";
 import CreateMarketModal from "./CreateMarketModal";
+import { useRangeBased } from "../contexts/RangeBasedMarketProvider";
 
 export function Navbar() {
   const [searchFocused, setSearchFocused] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isCreateMarketModalOpen, setIsCreateMarketModalOpen] = useState(false); // Add this state
-
+  const {userPoints} = useRangeBased();
   const { connect, connectors } = useConnect();
   const { disconnect } = useDisconnect();
   const { address } = useAccount();
@@ -48,29 +49,14 @@ export function Navbar() {
               <Link href="/leaderboard">Leaderboard</Link>
             </span>
           </div>
-          <div
-            className={`transition-all duration-200 ease-in-out border border-[#ffffff1a] bg-[#6f6f6f33] backdrop-blur-md px-4 py-2 rounded-full flex items-center space-x-3 ${
-              searchFocused ? "ring-2 ring-white" : ""
-            }`}
-          >
-            <img
-              src="/icons/search.svg"
-              alt="Search"
-              className="w-4 h-4 opacity-70"
-            />
-            <input
-              type="text"
-              placeholder="Search Social Market..."
-              className="bg-transparent outline-none text-base text-white placeholder-gray-400 w-48 sm:w-32"
-              onFocus={() => setSearchFocused(true)}
-              onBlur={() => setSearchFocused(false)}
-            />
-            <img
-              src="/icons/settings.png"
-              alt="Settings"
-              className="w-4 h-4 opacity-70 cursor-pointer"
-            />
+
+          <div className="flex items-center space-x-2 text-gray-400 cursor-pointer hover:text-gray-300 transition-colors">
+            <img src="/icons/store.svg" alt="Store" className="w-6 h-6" />
+            <span className="font-semibold text-lg">
+              <Link href="/dashboard">Dashboard</Link>
+            </span>
           </div>
+          
         </div>
 
         {/* Center Logo */}
@@ -93,7 +79,7 @@ export function Navbar() {
             <div className="w-6 h-6 rounded-full bg-yellow-500 flex items-center justify-center text-sm">
               🪙
             </div>
-            <span className="text-white text-base font-semibold">1380 XP</span>
+            <span className="text-white text-base font-semibold">{userPoints} XP</span>
           </div>
 
           <WalletBar />

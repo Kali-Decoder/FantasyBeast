@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-"use client"
+"use client";
 import React, {
   createContext,
   useCallback,
@@ -12,6 +12,7 @@ import React, {
 import { cairo, CallData } from "starknet";
 import { useAccount, useConnect } from "@starknet-react/core";
 import { toast } from "react-hot-toast";
+import { postWithHeaders, getWithHeaders, api } from "../config";
 import {
   ETH_TOKEN_ADDRESS,
   STRK_TOKEN_ADDRESS,
@@ -43,14 +44,16 @@ export function useRangeBased() {
 // Provider component
 export function RangeBasedProvider({ children }: RangeBasedProviderProps) {
   // State
-  const { account, isConnected,address } = useAccount();
+  const { account, isConnected, address } = useAccount();
   const [status, setStatus] = useState<Status>("idle");
   const [error, setError] = useState<string | null>(null);
-    const { connect, connectors } = useConnect();
-      const [username, setUsername] = useState<string | undefined>();
-        const [connected, setConnected] = useState(false);
+  const { connect, connectors } = useConnect();
+  const [username, setUsername] = useState<string | undefined>();
+  const [connected, setConnected] = useState(false);
+  const [transactions, setTransactions] = useState<any[]>([]);
+  const [userPoints, setUserPoints] = useState<number>(0);
 
-    useEffect(() => {
+  useEffect(() => {
     if (!address) return;
     const controller = connectors.find((c) => c instanceof ControllerConnector);
     if (controller) {
@@ -82,7 +85,7 @@ export function RangeBasedProvider({ children }: RangeBasedProviderProps) {
         throw new Error("Account not connected");
       }
 
-      console.log({question,start_time,end_time,max_bettors,amount})
+      console.log({ question, start_time, end_time, max_bettors, amount });
 
       const id = toast.loading("Creating pool...");
       try {
@@ -111,7 +114,7 @@ export function RangeBasedProvider({ children }: RangeBasedProviderProps) {
             }),
           },
         ]);
-        
+
         const res = await provider.waitForTransaction(
           multiCall?.transaction_hash || ""
         );
@@ -160,7 +163,7 @@ export function RangeBasedProvider({ children }: RangeBasedProviderProps) {
             }),
           },
         ]);
-        
+
         const res = await provider.waitForTransaction(
           multiCall?.transaction_hash || ""
         );
@@ -199,7 +202,7 @@ export function RangeBasedProvider({ children }: RangeBasedProviderProps) {
             }),
           },
         ]);
-        
+
         const res = await provider.waitForTransaction(
           multiCall?.transaction_hash || ""
         );
@@ -237,7 +240,7 @@ export function RangeBasedProvider({ children }: RangeBasedProviderProps) {
             }),
           },
         ]);
-        
+
         const res = await provider.waitForTransaction(
           multiCall?.transaction_hash || ""
         );
@@ -255,7 +258,37 @@ export function RangeBasedProvider({ children }: RangeBasedProviderProps) {
     [account, connected, handleError]
   );
 
-  // Get pool details
+  const getTransactionsHistory = async () => {
+    try {
+      //  if(!address) {
+      //   throw new Error("No address connected");
+      // }
+
+      let data = await getWithHeaders(`/transactions`, {
+        "x-user-address": "0xcfa038455b54714821f291814071161c9870B891",
+      });
+      console.log("Transactions history:", data.data);
+      setTransactions(data.data.length ? data.data : []);
+    } catch (error) {
+      console.log("Error fetching transactions history:", error);
+    }
+  };
+
+  const getPoints = async () => {
+    try {
+      // if (!address) {
+      //   throw new Error("No address connected");
+      // }
+
+      let data = await getWithHeaders(`/users`, {
+        "x-user-address": "0xcfa038455b54714821f291814071161c9870B891",
+      });
+      setUserPoints(data?.data?.xpPoints || 0);
+    } catch (error) {
+      console.error("Error fetching points:", error);
+      return 0; // Return 0 or handle error as needed
+    }
+  };
   const getPoolDetail = useCallback(
     async (pool_id: number): Promise<any | undefined> => {
       try {
@@ -273,7 +306,7 @@ export function RangeBasedProvider({ children }: RangeBasedProviderProps) {
         );
 
         setStatus("success");
-        
+
         return response as any;
       } catch (err) {
         handleError(err);
@@ -284,7 +317,10 @@ export function RangeBasedProvider({ children }: RangeBasedProviderProps) {
   );
 
   const getPrediction = useCallback(
-    async (pool_id: number, prediction_id: number): Promise<any | undefined> => {
+    async (
+      pool_id: number,
+      prediction_id: number
+    ): Promise<any | undefined> => {
       try {
         if (!range_based_contract) {
           throw new Error("Contract not available");
@@ -296,12 +332,12 @@ export function RangeBasedProvider({ children }: RangeBasedProviderProps) {
         const response = await range_based_contract.get_prediction(
           CallData.compile({
             pool_id: pool_id,
-            prediction_id: prediction_id
+            prediction_id: prediction_id,
           })
         );
 
         setStatus("success");
-        
+
         return response as any;
       } catch (err) {
         handleError(err);
@@ -327,7 +363,7 @@ export function RangeBasedProvider({ children }: RangeBasedProviderProps) {
             token: tokenAddress,
           })
         );
-        
+
         setStatus("success");
         return BigInt(response.toString());
       } catch (err) {
@@ -337,6 +373,12 @@ export function RangeBasedProvider({ children }: RangeBasedProviderProps) {
     },
     [handleError]
   );
+
+  useEffect(() => {
+    // Fetch contract balance on mount
+    getTransactionsHistory();
+    getPoints();
+  }, [getTransactionsHistory]);
 
   // Create value object for the context that matches RangeBasedContextValue
   const value = useMemo(
@@ -349,11 +391,13 @@ export function RangeBasedProvider({ children }: RangeBasedProviderProps) {
       getPoolDetail,
       getPrediction,
       getContractBalance,
-      
+
       // State
       status,
       error,
       isConnected,
+      transactions,
+      userPoints,
     }),
     [
       createPool,
@@ -366,6 +410,8 @@ export function RangeBasedProvider({ children }: RangeBasedProviderProps) {
       status,
       error,
       isConnected,
+      transactions,
+      userPoints,
     ]
   );
 
