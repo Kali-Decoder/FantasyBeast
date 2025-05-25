@@ -1,21 +1,40 @@
 const express = require("express");
 const router = express.Router();
 const Transaction = require("../models/transactions.schema");
-
-router.post("/:walletAddress", async (req, res) => {
+const User = require("../models/user.schema");
+router.post("/", async (req, res) => {
   try {
-    const { walletAddress } = req.params;
-    const { trxHash, event, pointsEarned } = req.body;
+    const { trxHash, event, userAddress } = req.body;
 
-    if (!trxHash || !event || pointsEarned === undefined) {
+    if (!trxHash || !event) {
       return res.status(400).json({ error: "All fields are required." });
     }
+    let pointsEarned = 0;
+    if (event === "range-based") {
+      pointsEarned = 10;
+    } else if (event === "binary-based") {
+      pointsEarned = 20;
+    } else if (event === "create") {
+      pointsEarned = 30;
+    } else {
+      return res.status(400).json({ error: "Invalid event type." });
+    }
+    if (!userAddress) {
+      return res.status(400).json({ error: "Wallet address is required." });
+    }
+
+    const user = User.findOne({ walletAddress: userAddress.toLowerCase() });
+    if (!user) {
+      return res.status(404).json({ error: "User not found." });
+    }
+    user.xpPoints += pointsEarned;
+    await user.save(); 
 
     const transaction = new Transaction({
       trxHash,
       event,
       pointsEarned,
-      walletAddress: walletAddress.toLowerCase(),
+      walletAddress: userAddress.toLowerCase(),
     });
 
     await transaction.save();
