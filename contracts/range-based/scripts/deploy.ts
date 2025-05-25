@@ -5,7 +5,7 @@ dotenv.config();
 
 async function main() {
   const provider = new RpcProvider({
-    nodeUrl: "https://sepolia.rpc.starknet.id",
+    nodeUrl: "https://starknet-sepolia.public.blastapi.io/rpc/v0_8",
   });
 
   // initialize existing predeployed account 0
@@ -37,34 +37,17 @@ async function main() {
 
   const constructor = myCallData.compile("constructor", {
   strk_token_address: "0x04718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d",
-  protocol_fee: 500  // 5% fee (500 basis points) for binary
+  protocol_fee: 100  // 1% fee (500 basis points) for binary
 });
 
-  console.log({constructor})
+  // console.log({constructor})
   const deployResponse = await account0.declareAndDeploy(
     {
       contract: sierraCode,
       casm: casmCode,
       constructorCalldata: constructor,
       salt: stark.randomAddress(),
-    },
-    // {
-    //   resourceBounds: {
-    //     l1_gas: {
-    //       max_amount: "0x1189",                     // Keep this as is
-    //       max_price_per_unit: "0x56ce69332261",     // Fine
-    //     },
-    //     l2_gas: {
-    //       max_amount: "0x141720",                   // Fine
-    //       max_price_per_unit: "0x2309ee097",        // Fine
-    //     },
-    //     l1_data_gas: {
-    //       max_amount: "0x128",                      // Good (≥ 128)
-    //       max_price_per_unit: "0x1000"              // ✅ Bump to 4096 (just to be safe)
-    //     },
-    //   }
-
-    // }
+    }
   );
 
 

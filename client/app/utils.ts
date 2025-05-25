@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 export function getRandomNumber() {
   return Math.floor(Math.random() * 1000000);
 }
@@ -95,3 +96,33 @@ export const addOrUpdatePlayer = ({
 
   setLeaderboard(updated);
 };
+
+
+export function parseContractData(data: any[]) {
+  return data.map(entry => ({
+    pool_id: parseInt(entry.pool_id, 16),
+    creator: entry.creator,
+    question: hexToUtf8(entry.question),
+    start_time: parseInt(entry.start_time, 16),
+    end_time: parseInt(entry.end_time, 16),
+    max_bettors: parseInt(entry.max_bettors, 16),
+    total_bets: parseInt(entry.total_bets, 16),
+    total_amount: parseInt(entry.total_amount, 16),
+    actual_result: parseInt(entry.actual_result, 16),
+    status: entry.status 
+  }));
+}
+
+// Helper to convert hex string to UTF-8
+function hexToUtf8(hex: string) {
+  if (!hex || hex === "0x") return "";
+  const hexStr = hex.startsWith("0x") ? hex.slice(2) : hex;
+  const bytes = hexStr?.match(/.{1,2}/g)?.map(byte => parseInt(byte, 16));
+  return new TextDecoder().decode(new Uint8Array(bytes!));
+}
+
+export function parseHexToNumber(hex: string) {
+  if (!hex || hex === "0x") return 0;
+  return parseInt(hex, 16);
+}
+

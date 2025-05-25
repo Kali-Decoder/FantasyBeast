@@ -1,17 +1,20 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 import { useEffect, useState } from "react";
 import WalletBar from "./WalletBar";
 import { useAccount, useConnect, useDisconnect } from "@starknet-react/core";
 import ControllerConnector from "@cartridge/connector/controller";
 import Link from "next/link";
+import CreateMarketModal from "./CreateMarketModal";
 
 export function Navbar() {
   const [searchFocused, setSearchFocused] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isCreateMarketModalOpen, setIsCreateMarketModalOpen] = useState(false); // Add this state
 
   const { connect, connectors } = useConnect();
   const { disconnect } = useDisconnect();
-  const { address, account } = useAccount();
+  const { address } = useAccount();
   const [username, setUsername] = useState<string | undefined>();
   const [connected, setConnected] = useState(false);
 
@@ -25,27 +28,7 @@ export function Navbar() {
     }
   }, [address, connectors]);
 
-  const handleControllerClick = async (e: { stopPropagation: () => void }) => {
-    e.stopPropagation();
-    try {
-      if (address) {
-        await disconnect();
-        setConnected(false);
-        setUsername(undefined);
-      } else {
-        const controller = connectors.find(
-          (c) => c instanceof ControllerConnector
-        );
-        if (!controller) {
-          throw new Error("Controller connector not found");
-        }
-        await connect({ connector: controller });
-        setConnected(true);
-      }
-    } catch (error) {
-      console.error("Controller connection error:", error);
-    }
-  };
+
 
   return (
     <>
@@ -97,7 +80,10 @@ export function Navbar() {
 
         {/* Right: Icons or Wallet */}
         <div className="flex items-center space-x-6">
-          <div className="flex items-center space-x-2 bg-gray-800 hover:bg-gray-700 px-4 py-2 rounded-full transition-colors cursor-pointer">
+          <div 
+            className="flex items-center space-x-2 bg-gray-800 hover:bg-gray-700 px-4 py-2 rounded-full transition-colors cursor-pointer"
+            onClick={() => setIsCreateMarketModalOpen(true)} // Add click handler
+          >
             <div className="w-6 h-6 rounded-full flex items-center justify-center text-sm">
               📈
             </div>
@@ -172,6 +158,14 @@ export function Navbar() {
           </div>
         </div>
       )}
+
+      {/* Create Market Modal */}
+       {isCreateMarketModalOpen && (
+        <CreateMarketModal
+          onClose={() => setIsCreateMarketModalOpen(false)}
+        />
+      )}
+   
     </>
   );
 }

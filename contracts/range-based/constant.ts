@@ -115,6 +115,52 @@ export const abi = [
     ]
   },
   {
+    "type": "struct",
+    "name": "buzzify::PoolInfo",
+    "members": [
+      {
+        "name": "pool_id",
+        "type": "core::integer::u32"
+      },
+      {
+        "name": "creator",
+        "type": "core::starknet::contract_address::ContractAddress"
+      },
+      {
+        "name": "question",
+        "type": "core::felt252"
+      },
+      {
+        "name": "start_time",
+        "type": "core::integer::u64"
+      },
+      {
+        "name": "end_time",
+        "type": "core::integer::u64"
+      },
+      {
+        "name": "max_bettors",
+        "type": "core::integer::u32"
+      },
+      {
+        "name": "total_bets",
+        "type": "core::integer::u32"
+      },
+      {
+        "name": "total_amount",
+        "type": "core::integer::u256"
+      },
+      {
+        "name": "actual_result",
+        "type": "core::integer::u256"
+      },
+      {
+        "name": "status",
+        "type": "buzzify::PoolStatus"
+      }
+    ]
+  },
+  {
     "type": "interface",
     "name": "buzzify::IPredictionMarket",
     "items": [
@@ -230,6 +276,28 @@ export const abi = [
         "outputs": [
           {
             "type": "buzzify::PredictionInfo"
+          }
+        ],
+        "state_mutability": "view"
+      },
+      {
+        "type": "function",
+        "name": "get_all_pools",
+        "inputs": [],
+        "outputs": [
+          {
+            "type": "core::array::Array::<buzzify::PoolInfo>"
+          }
+        ],
+        "state_mutability": "view"
+      },
+      {
+        "type": "function",
+        "name": "get_pools_count",
+        "inputs": [],
+        "outputs": [
+          {
+            "type": "core::integer::u32"
           }
         ],
         "state_mutability": "view"
@@ -398,6 +466,7 @@ export const abi = [
   }
 ]
 
+
 export const binaryAbi = [
   {
     "type": "impl",
@@ -541,6 +610,20 @@ export const binaryAbi = [
       {
         "name": "claimed",
         "type": "core::bool"
+      }
+    ]
+  },
+  {
+    "type": "struct",
+    "name": "buzzify::MarketWithId",
+    "members": [
+      {
+        "name": "market_id",
+        "type": "core::integer::u32"
+      },
+      {
+        "name": "market_info",
+        "type": "buzzify::MarketInfo"
       }
     ]
   },
@@ -708,6 +791,28 @@ export const binaryAbi = [
         "outputs": [
           {
             "type": "core::array::Array::<core::integer::u32>"
+          }
+        ],
+        "state_mutability": "view"
+      },
+      {
+        "type": "function",
+        "name": "get_all_markets",
+        "inputs": [],
+        "outputs": [
+          {
+            "type": "core::array::Array::<buzzify::MarketWithId>"
+          }
+        ],
+        "state_mutability": "view"
+      },
+      {
+        "type": "function",
+        "name": "get_markets_count",
+        "inputs": [],
+        "outputs": [
+          {
+            "type": "core::integer::u32"
           }
         ],
         "state_mutability": "view"
@@ -912,8 +1017,9 @@ export const binaryAbi = [
 
 
 
-export const range_deployAddress = "0x6514990e270b98d65f6357546567729b9c2906fc4bf0699d9bd9f52705d3c6d"
+
+export const range_deployAddress = "0x712fd40927f728066c7df74251b6e73604efb878aa30a9b2ba2df639e5ca4d6"
 
 
-export const binary_deployAddress = "0xc4897c0c128375224f352519c8d0640465542ee2729f0444359ced82ab4f12"
+export const binary_deployAddress = "0x1aba545c908c9b1acd30b94fb847c43795c07ea1054d2e5b765c02925ea6d9e"
 

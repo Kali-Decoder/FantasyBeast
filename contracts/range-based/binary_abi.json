@@ -145,6 +145,20 @@
     ]
   },
   {
+    "type": "struct",
+    "name": "buzzify::MarketWithId",
+    "members": [
+      {
+        "name": "market_id",
+        "type": "core::integer::u32"
+      },
+      {
+        "name": "market_info",
+        "type": "buzzify::MarketInfo"
+      }
+    ]
+  },
+  {
     "type": "interface",
     "name": "buzzify::IBinaryPredictionMarket",
     "items": [
@@ -308,6 +322,28 @@
         "outputs": [
           {
             "type": "core::array::Array::<core::integer::u32>"
+          }
+        ],
+        "state_mutability": "view"
+      },
+      {
+        "type": "function",
+        "name": "get_all_markets",
+        "inputs": [],
+        "outputs": [
+          {
+            "type": "core::array::Array::<buzzify::MarketWithId>"
+          }
+        ],
+        "state_mutability": "view"
+      },
+      {
+        "type": "function",
+        "name": "get_markets_count",
+        "inputs": [],
+        "outputs": [
+          {
+            "type": "core::integer::u32"
           }
         ],
         "state_mutability": "view"

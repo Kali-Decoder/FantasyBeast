@@ -1,3 +1,5 @@
+/* eslint-disable @next/next/no-css-tags */
+/* eslint-disable @next/next/no-page-custom-font */
 "use client";
 import "./globals.css";
 import { useEffect } from "react";
@@ -10,6 +12,7 @@ import { Toaster } from "react-hot-toast";
 import { Navbar } from "./components/Navbar";
 import Script from "next/script";
 import { StarknetProvider } from "./components/StarknetProvider";
+import { RangeBasedProvider } from "./contexts/RangeBasedMarketProvider";
 export default function RootLayout({
   children,
 }: {
@@ -26,7 +29,10 @@ export default function RootLayout({
     <html lang="en">
       <Head>
         <title>Fantasy Beast - On Chain Social Predictions</title>
-        <meta name="description" content="Bets on Your Favourite Creators on Starkent" />
+        <meta
+          name="description"
+          content="Bets on Your Favourite Creators on Starkent"
+        />
         <link rel="icon" href="/favicon.ico" />
         <link rel="stylesheet" href="/css/style.css" />
         <link
@@ -49,10 +55,10 @@ export default function RootLayout({
         />
         <Script src="/js/scripts.js" strategy="afterInteractive" />
         <StarknetProvider>
-   
+          <RangeBasedProvider>
             <Navbar />
             <main className="w-full">{children}</main>
-     
+          </RangeBasedProvider>
         </StarknetProvider>
         <Toaster />
       </body>

@@ -1,27 +1,69 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+"use client";
+import { useRangeContract } from "@/app/hooks/useRangeContract";
+import ControllerConnector from "@cartridge/connector/controller";
+import { useAccount, useConnect } from "@starknet-react/core";
 import Link from "next/link";
 import { useState, useEffect } from "react";
-import { XEmbed } from "react-social-media-embed";
 
-const RangeModal = ({ onClose, selectSingleRangeMarket }) => {
+type RangeMarket = {
+  minValue: string;
+  maxValue: string;
+  question: string;
+  metric: string;
+  url: string;
+};
+
+type RangeModalProps = {
+  onClose: () => void;
+  selectSingleRangeMarket: RangeMarket;
+};
+
+const RangeModal: React.FC<RangeModalProps> = ({
+  onClose,
+  selectSingleRangeMarket,
+}) => {
   const min = parseFloat(selectSingleRangeMarket?.minValue) || 0;
   const max = parseFloat(selectSingleRangeMarket?.maxValue) || 100;
 
   const [value, setValue] = useState((min + max) / 2);
   const [amount, setAmount] = useState(0);
+
+  const { account, address } = useAccount();
+  const { connectors } = useConnect();
+
+  const [username, setUsername] = useState<string | undefined>();
+  const [connected, setConnected] = useState(false);
+
+  useEffect(() => {
+    if (!address) return;
+    const controller = connectors.find(
+      (c): c is ControllerConnector => c instanceof ControllerConnector
+    );
+    if (controller) {
+      controller
+        .username()
+        ?.then((n) => setUsername(n));
+      setConnected(true);
+    }
+  }, [address, connectors]);
+
+  const { placeBet } = useRangeContract(connected, account);
+
   useEffect(() => {
     setValue((min + max) / 2);
   }, [min, max]);
 
-  const handleSubmit = () => {
-    console.log("Selected value:", value);
-    // Add your submission logic here
+  const handleSubmit = async () => {
+    console.log("Selected value:", value, amount);
+    await placeBet(3, value, amount); // Example: 3 can be replaced with market ID
     onClose();
   };
 
   return (
     <div className="fixed inset-0 z-50 bg-black font-techno bg-opacity-50 flex items-center justify-center">
       <div className="bg-black p-6 rounded-lg shadow-lg max-w-md w-full">
-        <p className="text-white mb-2 text-xl mb-8">
+        <p className="text-white mb-2 text-xl">
           {selectSingleRangeMarket?.question}
         </p>
 
@@ -42,7 +84,7 @@ const RangeModal = ({ onClose, selectSingleRangeMarket }) => {
             className="w-full"
           />
 
-          {/* Number input for precision */}
+          {/* Number input for amount */}
           <input
             type="number"
             value={amount}
@@ -50,7 +92,7 @@ const RangeModal = ({ onClose, selectSingleRangeMarket }) => {
             className="w-full p-2 rounded-md border border-gray-600 text-black"
           />
 
-          {/* Selected Value display */}
+          {/* Selected values */}
           <div className="text-sm text-white">
             Predicted Value: <span className="text-blue-400">{value}</span>
           </div>
@@ -58,13 +100,13 @@ const RangeModal = ({ onClose, selectSingleRangeMarket }) => {
             Amount Bet: <span className="text-blue-400">{amount} STRK</span>
           </div>
           <div className="text-sm text-white">
-            Betting Key Metric :{" "}
+            Betting Key Metric:{" "}
             <span className="text-blue-400 uppercase">
               {selectSingleRangeMarket?.metric}
             </span>
           </div>
           <div className="text-sm text-white">
-            Creator :{" "}
+            Creator:{" "}
             <span className="text-blue-400 uppercase">
               <Link
                 href={selectSingleRangeMarket?.url}
