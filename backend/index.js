@@ -28,6 +28,7 @@ app.use(async (req, res, next) => {
 app.use("/api/users", require("./routes/user.routes"));
 app.use("/api/pools", require("./routes/pool.routes"));
 app.use("/api/transactions", require("./routes/transaction.routes"));
+app.use("/api/leaderboard", require("./routes/leaderboard.routes"));
 app.listen(PORT, () => {
   console.log(`Server started on port ${PORT}`);
 });
