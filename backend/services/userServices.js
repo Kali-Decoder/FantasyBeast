@@ -6,7 +6,7 @@ const createUser = async (address) => {
   });
   if (existingUser) return existingUser;
 
-  const user = new User({ walletAddress: address.toLowerCase() });
+  const user = new User({ walletAddress: address.toLowerCase(), xpPoints: 0 });
   return await user.save();
 };
 

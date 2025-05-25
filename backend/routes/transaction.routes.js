@@ -23,12 +23,12 @@ router.post("/", async (req, res) => {
       return res.status(400).json({ error: "Wallet address is required." });
     }
 
-    const user = User.findOne({ walletAddress: userAddress.toLowerCase() });
+    const user = await User.findOne({ walletAddress: userAddress.toLowerCase() });
     if (!user) {
       return res.status(404).json({ error: "User not found." });
     }
-    user.xpPoints += pointsEarned;
-    await user.save(); 
+    user.xpPoints += Number(pointsEarned);
+    await user.save();
 
     const transaction = new Transaction({
       trxHash,
@@ -38,19 +38,20 @@ router.post("/", async (req, res) => {
     });
 
     await transaction.save();
-    return res.status(201).json(transaction);
+    return res.status(201).json({ transaction, user });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Transaction creation failed." });
   }
 });
 
-router.get("/:walletAddress", async (req, res) => {
+router.get("/", async (req, res) => {
   try {
-    const walletAddress = req.params.walletAddress.toLowerCase();
-
-    const transactions = await Transaction.find({ walletAddress });
-
+    const {userAddress } = req.body;
+    if(!userAddress){
+      
+    }
+    const transactions = await Transaction.find({ walletAddress:userAddress.toLowerCase() });
     return res.status(200).json(transactions);
   } catch (err) {
     console.error(err);

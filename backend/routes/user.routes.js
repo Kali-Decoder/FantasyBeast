@@ -3,19 +3,22 @@ const router = express.Router();
 
 const User = require("../models/user.schema");
 
-
 router.post("/register", async (req, res) => {
   try {
-    const { walletAddress } = req.body;
+    const { userAddress } = req.body;
+    console.log("Registering user with address:", userAddress);
 
-    if (!walletAddress) {
+    if (!userAddress) {
       return res.status(400).json({ error: "Wallet address is required." });
     }
 
-    let user = await User.findOne({ walletAddress: walletAddress.toLowerCase() });
+    let user = await User.findOne({ walletAddress: userAddress.toLowerCase() });
 
     if (!user) {
-      user = new User({ walletAddress: walletAddress.toLowerCase(), xpPoints: 0 });
+      user = new User({
+        walletAddress: userAddress.toLowerCase(),
+        xpPoints: 0,
+      });
       await user.save();
     }
 
@@ -27,11 +30,11 @@ router.post("/register", async (req, res) => {
 });
 
 // Get user data
-router.get("/:walletAddress", async (req, res) => {
+router.get("/", async (req, res) => {
   try {
-    const walletAddress = req.params.walletAddress.toLowerCase();
+    const { userAddress } = req.body;
 
-    const user = await User.findOne({ walletAddress });
+    const user = await User.findOne({ walletAddress:userAddress.toLowerCase() });
 
     if (!user) {
       return res.status(404).json({ error: "User not found." });
