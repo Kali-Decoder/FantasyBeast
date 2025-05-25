@@ -11,7 +11,7 @@ require("./db");
 
 
 app.use(cors({
-  origin: "http://localhost:8080",
+  origin: ["https://fantasy-fiesta-backend.vercel.app/","http://localhost:8080"],
   methods: ["GET", "POST", "PUT", "DELETE"],
   allowedHeaders: ["Content-Type", "Authorization"]
 }));
