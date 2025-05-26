@@ -12,7 +12,6 @@ const BinaryModal = ({ onClose, selectSingleBinaryMarket }) => {
   const { connectors } = useConnect();
   const [username, setUsername] = useState<string | undefined>();
   const [connected, setConnected] = useState(false);
-
   useEffect(() => {
     if (!address) return;
     const controller = connectors.find(
@@ -23,8 +22,6 @@ const BinaryModal = ({ onClose, selectSingleBinaryMarket }) => {
       setConnected(true);
     }
   }, [address, connectors]);
-
-
 
   const { placeBet } = useBinaryMarketContract(connected, account);
 
