@@ -242,8 +242,6 @@ export const useRangeContract = (connected: boolean, account: any) => {
 
         const receipt = await provider.waitForTransaction(txHash);
         console.log("Set result transaction receipt:", receipt);
-
-        // Extract result set event data
         const resultSetEvent = receipt?.events?.find(
           (e: { from_address: string }) => e.from_address === RANGE_BASED_MARKET
         );
