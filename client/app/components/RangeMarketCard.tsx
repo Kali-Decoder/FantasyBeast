@@ -31,6 +31,25 @@ const RangeMarketCard: React.FC<RangeMarketCardProps> = ({
   setShowRangeModal, 
   setSelectSingleRangeMarket 
 }) => {
+  const tweetLinks = [
+    "https://x.com/Starknet/status/1926201730921828506",
+    "https://x.com/akashneelesh/status/1925808560400638201",
+    "https://x.com/reet_batra/status/1926201645043511351",
+    "https://x.com/StarknetAfrica/status/1925816893094474001",
+    "https://x.com/0xNurstar/status/1926279962434089189",
+    "https://x.com/starkience/status/1926267201708802196",
+    "https://x.com/GabinMarignier/status/1925487740621123942",
+    "https://x.com/Starknet_OG/status/1925170624009318426",
+    "https://x.com/sneha_1907/status/1927095017094435236",
+    "https://x.com/sneha_1907/status/1926650200124240188",
+    "https://x.com/itsNikku876/status/1927096068828770370",
+    "https://x.com/itsNikku876/status/1926537189380202552"
+  ];
+  
+  function getRandomTweetUrl() {
+    const randomIndex = Math.floor(Math.random() * tweetLinks.length);
+    return tweetLinks[randomIndex];
+  }
 
   const handlePredictClick = () => {
     if (setShowRangeModal) setShowRangeModal(true);
@@ -45,7 +64,7 @@ const RangeMarketCard: React.FC<RangeMarketCardProps> = ({
       <div className="rounded-md overflow-hidden mb-4 h-[180px] sm:h-[200px] md:h-[220px]">
         <XEmbed
           style={{ borderRadius: "0px", height: "100%" }}
-          url={market.url || "https://x.com/sneha_1907/status/1927025631595737372"}
+          url={getRandomTweetUrl()}
           width="100%"
         />
       </div>
