@@ -24,7 +24,7 @@ export default function LeaderboardTable() {
       `🔥 🔥 I'm currently holding the ${leaderboardPosition} position on the Fantasy Beast leaderboard — the ultimate on-chain prediction game on Starknet!
 Think you can beat me predicting your favorite creators? 💥👇 Play Now 
 ${appUrl}
-@StarknetFndn @Starknet @HackQuest_ @robertkp13 `
+@StarknetFndn @Starknet @HackQuest_ @akashneelesh`
     );
 
     return `https://twitter.com/intent/tweet?text=${tweetText}`;
