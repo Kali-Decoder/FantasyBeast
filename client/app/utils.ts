@@ -193,9 +193,20 @@ export function toSmallestUnit(amount: number | string, decimals: number): strin
   return (whole + paddedFraction).replace(/^0+/, '') || "0";
 }
 
-export function fromSmallestUnit(amount: string | number, decimals: number): string {
-  const amtStr = amount.toString().padStart(decimals + 1, '0');
-  const whole = amtStr.slice(0, -decimals) || '0';
-  const fraction = amtStr.slice(-decimals).replace(/0+$/, ''); // remove trailing zeros
-  return fraction ? `${whole}.${fraction}` : whole;
+export function formatSTRK(weiAmount: string) {
+    // Remove commas first
+    const cleanAmount = weiAmount.toString().replace(/,/g, '');
+    
+    // Pad with zeros to ensure at least 19 digits
+    const paddedAmount = cleanAmount.padStart(19, '0');
+    
+    // Split at 18 digits from the right
+    const whole = paddedAmount.slice(0, -18) || '0';
+    const decimal = paddedAmount.slice(-18);
+    
+    // Remove trailing zeros from decimal part
+    const cleanDecimal = decimal.replace(/0+$/, '');
+    
+    // Return formatted result
+    return cleanDecimal ? `${whole}.${cleanDecimal}` : whole;
 }

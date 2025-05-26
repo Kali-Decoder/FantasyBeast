@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React from "react";
 import { XEmbed } from "react-social-media-embed";
-import { fromSmallestUnit, toSmallestUnit } from "../utils";
+import { formatSTRK, fromSmallestUnit } from "../utils";
 
 
 
@@ -71,7 +71,7 @@ const BinaryMarketCard: React.FC<any> = ({
 
           <div className="bg-black mt-4 text-white backdrop-blur-sm rounded-full px-3 py-1 flex items-center">
             <span className="text-sm mr-1">🔐</span>
-            <span className="font-bold">Amount Locked : {market.tvl/10e18} STRK</span>
+            <span className="font-bold">Amount Locked : {formatSTRK(market.tvl)} STRK</span>
           </div>
         </div>
 

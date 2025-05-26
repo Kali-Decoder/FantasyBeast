@@ -3,7 +3,7 @@
 "use client"
 import React from "react";
 import { XEmbed } from "react-social-media-embed";
-import { fromSmallestUnit } from "../utils";
+import { formatSTRK } from "../utils";
 
 interface Market {
   url: string;
@@ -69,7 +69,7 @@ const RangeMarketCard: React.FC<RangeMarketCardProps> = ({
           Metric: {(market.metric)}
         </div>
         <div className="bg-black backdrop-blur-sm rounded-full px-3 py-1">
-          TVL: {fromSmallestUnit(market.tvl,18)} STRK
+          TVL: {formatSTRK(market.tvl)} STRK
         </div>
       </div>
 
