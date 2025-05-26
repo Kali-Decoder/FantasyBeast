@@ -20,7 +20,7 @@ export const useRangeContract = (connected: boolean, account: any) => {
   useEffect(() => {
     if (account && !contractRef.current) {
       contractRef.current = new Contract(
-        Range_Market_Abi, // You'll need to add this to your imports
+        Range_Market_Abi, 
         RANGE_BASED_MARKET,
         account
       );
