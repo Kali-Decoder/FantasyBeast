@@ -3,8 +3,8 @@ const User = require("../models/user.schema");
 
 const getPointsForEvent = (event) => {
   const pointsMap = {
-    "range-based": 10,
-    "binary-based": 20,
+    "range-based": 20,
+    "binary-based": 30,
     "create": 30,
   };
   return pointsMap[event] || null;
@@ -35,8 +35,9 @@ const createTransactionService = async ({ trxHash, event, userAddress }) => {
   return { transaction, user };
 };
 
-const getTransactionsByAddress = async (walletAddress) => {
-  return await Transaction.find({ walletAddress: walletAddress.toLowerCase() });
+const getTransactionsByAddress = async (_walletAddress) => {
+
+  return await Transaction.find({ walletAddress: _walletAddress.toLowerCase() });
 };
 
 module.exports = {
