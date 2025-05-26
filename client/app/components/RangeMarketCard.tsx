@@ -3,6 +3,7 @@
 "use client"
 import React from "react";
 import { XEmbed } from "react-social-media-embed";
+import { fromSmallestUnit } from "../utils";
 
 interface Market {
   url: string;
@@ -44,7 +45,7 @@ const RangeMarketCard: React.FC<RangeMarketCardProps> = ({
       <div className="rounded-md overflow-hidden mb-4 h-[180px] sm:h-[200px] md:h-[220px]">
         <XEmbed
           style={{ borderRadius: "0px", height: "100%" }}
-          url={market.url || "https://x.com/vaibhavgeek/status/1910290774614523928"}
+          url={market.url || "https://x.com/sneha_1907/status/1927025631595737372"}
           width="100%"
         />
       </div>
@@ -65,7 +66,7 @@ const RangeMarketCard: React.FC<RangeMarketCardProps> = ({
       {/* Metric and TVL */}
       <div className="flex justify-between gap-2 text-sm font-semibold text-white mb-4">
         <div className="bg-black backdrop-blur-sm rounded-full px-3 py-1">
-          Metric: {market.metric}
+          Metric: {fromSmallestUnit(market.metric,18)}
         </div>
         <div className="bg-black backdrop-blur-sm rounded-full px-3 py-1">
           TVL: {market.tvl} STRK
