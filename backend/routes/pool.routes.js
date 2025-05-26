@@ -14,7 +14,7 @@ router.post("/", async (req, res) => {
     }
 
     const pool = new Pool({
-      poolId,
+      poolId:poolId.toString(),
       creator,
       marketType,
       question,
