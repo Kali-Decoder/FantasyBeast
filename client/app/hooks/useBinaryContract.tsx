@@ -11,7 +11,7 @@ import {
 } from "../constants";
 import { toast } from "react-hot-toast";
 import { Binary_Market_Abi } from "../abi"; // You might want to rename this to Binary_Market_Abi
-import { createMarketBackend, placeBetBackend, toSmallestUnit } from "../utils";
+import { createMarketBackend, parseHexToNumber, placeBetBackend, toSmallestUnit } from "../utils";
 import { useAccount } from "@starknet-react/core";
 
 // Enum types to match the contract
@@ -173,7 +173,7 @@ export const useBinaryMarketContract = (connected: boolean, account: any) => {
           question,
           postURL,
           new Date(end_time * 1000),
-          marketId
+          parseHexToNumber(marketId)
         );
 
         toast.success("Market created successfully! and you get 30 point", { id });
