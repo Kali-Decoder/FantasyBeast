@@ -85,25 +85,17 @@ export const useRangeContract = (connected: boolean, account: any) => {
         const receipt = await provider.waitForTransaction(txHash);
         console.log("Create pool transaction receipt:", receipt);
 
-        // Extract pool creation event data
+  
         const poolCreatedEvent = receipt?.events?.find(
           (e: { from_address: string }) => e.from_address === RANGE_BASED_MARKET
         );
 
         let poolId = null;
         if (poolCreatedEvent?.data) {
-          // Assuming the first data element is the pool ID
           poolId = poolCreatedEvent.data[0]?.toString();
           console.log("Pool created with ID:", poolId);
         }
-        console.log(
-          address,
-          txHash,
-          marketType,
-          question,
-          postURL,
-          new Date(end_time * 1000)
-        );
+
         await createMarketBackend(
           address,
           txHash,
