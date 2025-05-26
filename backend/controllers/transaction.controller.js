@@ -23,7 +23,6 @@ const getTransactionsController = async (req, res) => {
     if (!userAddress) {
       return res.status(400).json({ error: "Wallet address is required." });
     }
-
     const transactions = await getTransactionsByAddress(userAddress);
     return res.status(200).json(transactions);
   } catch (err) {
