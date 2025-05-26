@@ -1,18 +1,45 @@
-import { useState } from "react";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import { useBinaryMarketContract } from "@/app/hooks/useBinaryContract";
+import ControllerConnector from "@cartridge/connector/controller";
+import { useAccount, useConnect } from "@starknet-react/core";
+import { useEffect, useState } from "react";
 import {toast} from "react-hot-toast";
+
 const BinaryModal = ({ onClose, selectSingleBinaryMarket }) => {
   const [betAmount, setBetAmount] = useState("");
+    const { account, address } = useAccount();
+  const { connectors } = useConnect();
+  const [username, setUsername] = useState<string | undefined>();
+  const [connected, setConnected] = useState(false);
 
-  const handleSubmit = () => {
-    if (!betAmount || isNaN(betAmount)) {
+  useEffect(() => {
+    if (!address) return;
+    const controller = connectors.find(
+      (c: any) => c instanceof ControllerConnector
+    );
+    if (controller) {
+      controller?.username()?.then((n) => setUsername(n));
+      setConnected(true);
+    }
+  }, [address, connectors]);
+
+
+
+  const { placeBet } = useBinaryMarketContract(connected, account);
+
+
+  const handleSubmit = async () => {
+    if (!betAmount || isNaN(Number(betAmount))) {
       toast.error("Please enter a valid amount to bet.");
       return;
     }
 
     // You can call a function or API here to handle the bet submission
     console.log("Submitting bet of:", betAmount);
+    console.log({selectSingleBinaryMarket})
     // Example:
-    // submitBet({ amount: betAmount, market: selectSingleBinaryMarket });
+  //  await  placeBet();
 
     onClose(); // optionally close modal on submit
   };
