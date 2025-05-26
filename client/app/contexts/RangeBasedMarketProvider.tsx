@@ -13,9 +13,7 @@ import React, {
 import { CallData } from "starknet";
 import { useAccount, useConnect } from "@starknet-react/core";
 import { postWithHeaders, getWithHeaders, api } from "../config";
-import { range_based_contract } from "../constants";
 import {
-  RangeBasedContextValue,
   RangeBasedProviderProps,
   Status,
 } from "../types";

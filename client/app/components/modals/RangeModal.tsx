@@ -41,9 +41,7 @@ const RangeModal: React.FC<RangeModalProps> = ({
       (c): c is ControllerConnector => c instanceof ControllerConnector
     );
     if (controller) {
-      controller
-        .username()
-        ?.then((n) => setUsername(n));
+      controller.username()?.then((n) => setUsername(n));
       setConnected(true);
     }
   }, [address, connectors]);
@@ -120,7 +118,6 @@ const RangeModal: React.FC<RangeModalProps> = ({
         </div>
 
         <div className="flex gap-2 mt-6">
-         
           <button
             onClick={onClose}
             className="flex-1 bg-red-500 hover:bg-red-400 text-black font-bold py-2 px-4 rounded-xl border-2 border-white shadow-[3px_3px_0px_rgba(1,1,1,1)] active:translate-y-[2px] flex items-center justify-center"
