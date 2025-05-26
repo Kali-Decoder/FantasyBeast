@@ -52,7 +52,6 @@ export default function Home() {
                  ></div>
                </div>
 
-      {/* Custom radial gradient background overlay */}
       <div className="fixed inset-0  pointer-events-none"></div>
 
       <main className="relative z-10">

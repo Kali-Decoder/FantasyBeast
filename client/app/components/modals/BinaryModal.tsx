@@ -4,6 +4,7 @@ import { useBinaryMarketContract } from "@/app/hooks/useBinaryContract";
 import ControllerConnector from "@cartridge/connector/controller";
 import { useAccount, useConnect } from "@starknet-react/core";
 import { useEffect, useState } from "react";
+import {toast} from "react-hot-toast";
 
 const BinaryModal = ({ onClose, selectSingleBinaryMarket }) => {
   const [betAmount, setBetAmount] = useState("");
@@ -30,7 +31,7 @@ const BinaryModal = ({ onClose, selectSingleBinaryMarket }) => {
 
   const handleSubmit = async () => {
     if (!betAmount || isNaN(Number(betAmount))) {
-      alert("Please enter a valid amount to bet.");
+      toast.error("Please enter a valid amount to bet.");
       return;
     }
 
