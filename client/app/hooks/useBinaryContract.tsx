@@ -260,7 +260,7 @@ export const useBinaryMarketContract = (connected: boolean, account: any) => {
         }
 
         await placeBetBackend(
-          betPlacedEvent.data[2]?.toString(),
+          address,
           txHash,
           "binary-based"
         );

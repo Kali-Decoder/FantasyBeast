@@ -202,7 +202,7 @@ export const useRangeContract = (connected: boolean, account: any) => {
           console.log("Bet placed:", betInfo);
         }
         await placeBetBackend(
-          betPlacedEvent.data[2]?.toString(),
+          address,
           txHash,
           "range-based"
         );
