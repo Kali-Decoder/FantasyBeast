@@ -1,11 +1,11 @@
 import { useState } from "react";
-
+import {toast} from "react-hot-toast";
 const BinaryModal = ({ onClose, selectSingleBinaryMarket }) => {
   const [betAmount, setBetAmount] = useState("");
 
   const handleSubmit = () => {
     if (!betAmount || isNaN(betAmount)) {
-      alert("Please enter a valid amount to bet.");
+      toast.error("Please enter a valid amount to bet.");
       return;
     }
 

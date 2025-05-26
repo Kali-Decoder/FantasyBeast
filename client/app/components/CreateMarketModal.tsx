@@ -7,7 +7,7 @@ import { useRangeContract } from "../hooks/useRangeContract";
 import { useAccount, useConnect } from "@starknet-react/core";
 import ControllerConnector from "@cartridge/connector/controller";
 import { useBinaryMarketContract } from "../hooks/useBinaryContract";
-
+import toast from "react-hot-toast";
 export enum Outcome {
   Yes = 0,
   No = 1,
@@ -69,32 +69,32 @@ export default function CreateMarketModal({ onClose }: any) {
     e.preventDefault();
 
     if (!isConnected) {
-      alert("Please connect your wallet first");
+      toast.error("Please connect your wallet first");
       return;
     }
 
     if (!formData.question.trim()) {
-      alert("Please enter a market question");
+      toast.error("Please enter a market question");
       return;
     }
 
     if (!formData.startTime || !formData.endTime) {
-      alert("Please select start and end times");
+      toast.error("Please select start and end times");
       return;
     }
 
     if (new Date(formData.startTime) >= new Date(formData.endTime)) {
-      alert("End time must be after start time");
+      toast.error("End time must be after start time");
       return;
     }
 
     if (!formData.maxBettors || parseInt(formData.maxBettors) < 1) {
-      alert("Please enter a valid number of max participants");
+      toast.error("Please enter a valid number of max participants");
       return;
     }
 
     if (!formData.amount || parseFloat(formData.amount) <= 0) {
-      alert("Please enter a valid initial stake amount");
+      toast.error("Please enter a valid initial stake amount");
       return;
     }
 
