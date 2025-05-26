@@ -11,7 +11,7 @@ import {
 } from "../constants";
 import { toast } from "react-hot-toast";
 import { Binary_Market_Abi } from "../abi"; // You might want to rename this to Binary_Market_Abi
-import { createMarketBackend, placeBetBackend } from "../utils";
+import { createMarketBackend, placeBetBackend, toSmallestUnit } from "../utils";
 import { useAccount } from "@starknet-react/core";
 
 // Enum types to match the contract
@@ -127,7 +127,7 @@ export const useBinaryMarketContract = (connected: boolean, account: any) => {
             entrypoint: "approve",
             calldata: CallData.compile({
               spender: BINARY_BASED_MARKET,
-              amount: cairo.uint256(_amount),
+              amount: cairo.uint256(toSmallestUnit(_amount,18)),
             }),
           },
           {
@@ -140,7 +140,7 @@ export const useBinaryMarketContract = (connected: boolean, account: any) => {
               end_time,
               resolution_time,
               max_bettors,
-              initial_stake: cairo.uint256(_amount),
+              initial_stake: cairo.uint256(toSmallestUnit(_amount,18)),
               initial_prediction: initial_prediction,
             }),
           },
@@ -184,7 +184,7 @@ export const useBinaryMarketContract = (connected: boolean, account: any) => {
         return null;
       }
     },
-    [connected, account]
+    [connected, account, address]
   );
 
   const placeBet = useCallback(
@@ -211,7 +211,7 @@ export const useBinaryMarketContract = (connected: boolean, account: any) => {
             entrypoint: "approve",
             calldata: CallData.compile({
               spender: BINARY_BASED_MARKET,
-              amount: cairo.uint256(_amount),
+              amount: cairo.uint256(toSmallestUnit(_amount,18)),
             }),
           },
           {
@@ -220,7 +220,7 @@ export const useBinaryMarketContract = (connected: boolean, account: any) => {
             calldata: CallData.compile({
               market_id,
               prediction,
-              bet_amount: cairo.uint256(_amount),
+              bet_amount: cairo.uint256(toSmallestUnit(_amount,18)),
             }),
           },
         ]);

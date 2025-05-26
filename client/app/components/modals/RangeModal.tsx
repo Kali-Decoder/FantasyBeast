@@ -7,6 +7,7 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 
 type RangeMarket = {
+  poolId: number;
   minValue: string;
   maxValue: string;
   question: string;
@@ -46,6 +47,8 @@ const RangeModal: React.FC<RangeModalProps> = ({
     }
   }, [address, connectors]);
 
+  console.log({selectSingleRangeMarket})
+
   const { placeBet } = useRangeContract(connected, account);
 
   useEffect(() => {
@@ -53,8 +56,8 @@ const RangeModal: React.FC<RangeModalProps> = ({
   }, [min, max]);
 
   const handleSubmit = async () => {
-    console.log("Selected value:", value, amount);
-    await placeBet(3, value, amount); // Example: 3 can be replaced with market ID
+    console.log("Selected value:", value, amount,selectSingleRangeMarket?.poolId);
+    await placeBet(selectSingleRangeMarket?.poolId, value, amount); // Example: 3 can be replaced with market ID
     onClose();
   };
 

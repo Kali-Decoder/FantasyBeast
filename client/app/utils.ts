@@ -186,3 +186,9 @@ export const createMarketBackend = async (
     throw new Error("Failed to place bet. Please try again later.");
   }
 };
+
+export function toSmallestUnit(amount: number | string, decimals: number): string {
+  const [whole, fractional = ''] = amount.toString().split(".");
+  const paddedFraction = (fractional + "0".repeat(decimals)).slice(0, decimals);
+  return (whole + paddedFraction).replace(/^0+/, '') || "0";
+}

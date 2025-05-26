@@ -11,7 +11,7 @@ import {
 } from "../constants";
 import { toast } from "react-hot-toast";
 import { Range_Market_Abi } from "../abi";
-import { createMarketBackend, placeBetBackend } from "../utils";
+import { createMarketBackend, parseHexToNumber, placeBetBackend, toSmallestUnit } from "../utils";
 import { useAccount } from "@starknet-react/core";
 
 export const useRangeContract = (connected: boolean, account: any) => {
@@ -26,6 +26,8 @@ export const useRangeContract = (connected: boolean, account: any) => {
       );
     }
   }, [account]);
+
+  
 
   const createPool = useCallback(
     async (
@@ -59,7 +61,7 @@ export const useRangeContract = (connected: boolean, account: any) => {
             entrypoint: "approve",
             calldata: CallData.compile({
               spender: RANGE_BASED_MARKET,
-              amount: cairo.uint256(_amount),
+              amount: cairo.uint256(toSmallestUnit(_amount,18)),
             }),
           },
           {
@@ -70,7 +72,7 @@ export const useRangeContract = (connected: boolean, account: any) => {
               start_time,
               end_time,
               max_bettors,
-              initial_stake: cairo.uint256(_amount),
+              initial_stake: cairo.uint256(toSmallestUnit(_amount,18)),
             }),
           },
         ]);
@@ -137,6 +139,9 @@ export const useRangeContract = (connected: boolean, account: any) => {
       console.log({ pool_id, predicted_value, bet_amount });
 
       const id = toast.loading("Placing bet...");
+//       const betAmountHuman = 50.5;
+// const betAmountStr = toSmallestUnit(betAmountHuman, 18);
+// const betAmountUint256 = cairo.uint256(BigInt(betAmountStr));
 
       try {
         const _amount = (String(bet_amount));
@@ -146,7 +151,7 @@ export const useRangeContract = (connected: boolean, account: any) => {
             entrypoint: "approve",
             calldata: CallData.compile({
               spender: RANGE_BASED_MARKET,
-              amount: cairo.uint256(_amount),
+              amount: cairo.uint256(toSmallestUnit(_amount,18)),
             }),
           },
           {
@@ -154,8 +159,8 @@ export const useRangeContract = (connected: boolean, account: any) => {
             entrypoint: "place_bet",
             calldata: CallData.compile({
               pool_id,
-              predicted_value: cairo.uint256(predicted_value),
-              bet_amount: cairo.uint256(bet_amount),
+              predicted_value: cairo.uint256(toSmallestUnit(String(predicted_value,),18)),
+              bet_amount: cairo.uint256(toSmallestUnit(_amount,18)),
             }),
           },
         ]);
@@ -180,8 +185,8 @@ export const useRangeContract = (connected: boolean, account: any) => {
             poolId: betPlacedEvent.data[0]?.toString(),
             predictionId: betPlacedEvent.data[1]?.toString(),
             bettor: betPlacedEvent.data[2]?.toString(),
-            predictedValue: betPlacedEvent.data[3]?.toString(),
-            betAmount: betPlacedEvent.data[4]?.toString(),
+            predictedValue: parseHexToNumber(betPlacedEvent.data[3]?.toString()),
+            betAmount:parseHexToNumber(betPlacedEvent.data[5]?.toString()),
           };
           console.log("Bet placed:", betInfo);
         }
