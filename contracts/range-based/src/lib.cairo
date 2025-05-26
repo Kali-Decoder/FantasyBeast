@@ -18,6 +18,8 @@ struct Prediction {
 // Struct to represent a prediction pool
 #[derive(Copy, Drop, Serde, starknet::Store)]
 struct Pool {
+     // Contract owner (deployer)
+
     creator: starknet::ContractAddress,
     question: felt252,
     start_time: u64,
@@ -86,6 +88,8 @@ pub trait IPredictionMarket<TContractState> {
     fn get_prediction(self: @TContractState, pool_id: u32, prediction_id: u32) -> PredictionInfo;
     fn get_all_pools(self: @TContractState) -> Array<PoolInfo>;
     fn get_pools_count(self: @TContractState) -> u32;
+    fn get_owner(self: @TContractState) -> starknet::ContractAddress;
+    fn transfer_ownership(ref self: TContractState, new_owner: starknet::ContractAddress);
 }
 
 #[starknet::contract]
@@ -100,6 +104,7 @@ mod Buzzify {
     #[storage]
     struct Storage {
         // Contract balance
+        owner: starknet::ContractAddress,
         balance: u256,
         // Pool management
         pools_len: u32,
@@ -118,6 +123,7 @@ mod Buzzify {
         BetPlaced: BetPlaced,
         ResultSet: ResultSet,
         RewardClaimed: RewardClaimed,
+        OwnershipTransferred: OwnershipTransferred,
     }
 
     #[derive(Drop, starknet::Event)]
@@ -155,6 +161,12 @@ mod Buzzify {
         reward_amount: u256,
     }
 
+       #[derive(Drop, starknet::Event)]
+    struct OwnershipTransferred {
+        previous_owner: ContractAddress,
+        new_owner: ContractAddress,
+    }
+
     // Constants
     const MAX_PREDICTIONS: u64 = 1000; // Maximum number of predictions per pool
 
@@ -162,6 +174,7 @@ mod Buzzify {
     fn constructor(ref self: ContractState, strk_token_address: ContractAddress) {
         self.strk_token.write(strk_token_address);
         self.pools_len.write(0);
+        self.owner.write(get_caller_address());
     }
 
     #[abi(embed_v0)]
@@ -428,6 +441,26 @@ mod Buzzify {
         fn get_pools_count(self: @ContractState) -> u32 {
             self.pools_len.read()
         }
+
+               fn get_owner(self: @ContractState) -> ContractAddress {
+            self.owner.read()
+        }
+
+        fn transfer_ownership(ref self: ContractState, new_owner: ContractAddress) {
+            let caller = get_caller_address();
+            let current_owner = self.owner.read();
+            assert(caller == current_owner, 'Not the owner');
+            
+            let previous_owner = current_owner;
+            self.owner.write(new_owner);
+            
+            self.emit(
+                OwnershipTransferred {
+                    previous_owner: previous_owner,
+                    new_owner: new_owner,
+                }
+            );
+        }
     }
 
     #[generate_trait]
@@ -545,3 +578,4 @@ mod Buzzify {
         }
     }
 }
+

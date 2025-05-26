@@ -729,6 +729,29 @@ export const Range_Market_Abi:Abi = [
           }
         ],
         "state_mutability": "view"
+      },
+      {
+        "type": "function",
+        "name": "get_owner",
+        "inputs": [],
+        "outputs": [
+          {
+            "type": "core::starknet::contract_address::ContractAddress"
+          }
+        ],
+        "state_mutability": "view"
+      },
+      {
+        "type": "function",
+        "name": "transfer_ownership",
+        "inputs": [
+          {
+            "name": "new_owner",
+            "type": "core::starknet::contract_address::ContractAddress"
+          }
+        ],
+        "outputs": [],
+        "state_mutability": "external"
       }
     ]
   },
@@ -867,6 +890,23 @@ export const Range_Market_Abi:Abi = [
   },
   {
     "type": "event",
+    "name": "buzzify::Buzzify::OwnershipTransferred",
+    "kind": "struct",
+    "members": [
+      {
+        "name": "previous_owner",
+        "type": "core::starknet::contract_address::ContractAddress",
+        "kind": "data"
+      },
+      {
+        "name": "new_owner",
+        "type": "core::starknet::contract_address::ContractAddress",
+        "kind": "data"
+      }
+    ]
+  },
+  {
+    "type": "event",
     "name": "buzzify::Buzzify::Event",
     "kind": "enum",
     "variants": [
@@ -888,6 +928,11 @@ export const Range_Market_Abi:Abi = [
       {
         "name": "RewardClaimed",
         "type": "buzzify::Buzzify::RewardClaimed",
+        "kind": "nested"
+      },
+      {
+        "name": "OwnershipTransferred",
+        "type": "buzzify::Buzzify::OwnershipTransferred",
         "kind": "nested"
       }
     ]
