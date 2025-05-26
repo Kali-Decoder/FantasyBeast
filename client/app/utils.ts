@@ -99,9 +99,8 @@ export const addOrUpdatePlayer = ({
   setLeaderboard(updated);
 };
 
-
 export function parseContractData(data: any[]) {
-  return data.map(entry => ({
+  return data.map((entry) => ({
     pool_id: parseInt(entry.pool_id, 16),
     creator: entry.creator,
     question: hexToUtf8(entry.question),
@@ -111,7 +110,7 @@ export function parseContractData(data: any[]) {
     total_bets: parseInt(entry.total_bets, 16),
     total_amount: parseInt(entry.total_amount, 16),
     actual_result: parseInt(entry.actual_result, 16),
-    status: entry.status 
+    status: entry.status,
   }));
 }
 
@@ -119,7 +118,7 @@ export function parseContractData(data: any[]) {
 function hexToUtf8(hex: string) {
   if (!hex || hex === "0x") return "";
   const hexStr = hex.startsWith("0x") ? hex.slice(2) : hex;
-  const bytes = hexStr?.match(/.{1,2}/g)?.map(byte => parseInt(byte, 16));
+  const bytes = hexStr?.match(/.{1,2}/g)?.map((byte) => parseInt(byte, 16));
   return new TextDecoder().decode(new Uint8Array(bytes!));
 }
 
@@ -128,10 +127,14 @@ export function parseHexToNumber(hex: string) {
   return parseInt(hex, 16);
 }
 
-export const placeBetBackend = async (address: any,trxHash: any,event: any) => {
+export const placeBetBackend = async (
+  address: any,
+  trxHash: any,
+  event: any
+) => {
   try {
     const url = "/transactions"; // or full path like "https://api.example.com/transactions"
-    
+
     const data = {
       trxHash: trxHash,
       event: event, // or "binary-based", "create"
@@ -139,8 +142,8 @@ export const placeBetBackend = async (address: any,trxHash: any,event: any) => {
     };
 
     const headers = {
-        "x-user-address": address!,
-      };
+      "x-user-address": address!,
+    };
 
     const response = await postWithHeaders(url, data, headers);
     console.log("Transaction response:", response.data);
@@ -150,3 +153,34 @@ export const placeBetBackend = async (address: any,trxHash: any,event: any) => {
   }
 };
 
+export const createMarketBackend = async (
+  creator: any,
+  trxHash: any,
+  marketType: any,
+  question: any,
+  postURL: any,
+  endtime: any
+) => {
+  try {
+    const url = "/pools";
+
+    const data = {
+      creator,
+      trxHash,
+      marketType,
+      question,
+      url:postURL,
+      endTime:endtime
+    };
+
+    const headers = {
+      "x-user-address": creator!,
+    };
+
+    const response = await postWithHeaders(url, data, headers);
+    console.log("Transaction response:", response.data);
+  } catch (err) {
+    console.error("Error placing bet:", err);
+    throw new Error("Failed to place bet. Please try again later.");
+  }
+};

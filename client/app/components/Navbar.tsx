@@ -7,12 +7,13 @@ import ControllerConnector from "@cartridge/connector/controller";
 import Link from "next/link";
 import CreateMarketModal from "./CreateMarketModal";
 import { useRangeBased } from "../contexts/RangeBasedMarketProvider";
+import { Activity } from "lucide-react";
 
 export function Navbar() {
   const [searchFocused, setSearchFocused] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isCreateMarketModalOpen, setIsCreateMarketModalOpen] = useState(false); // Add this state
-  const {userPoints} = useRangeBased();
+  const { userPoints } = useRangeBased();
   const { connect, connectors } = useConnect();
   const { disconnect } = useDisconnect();
   const { address } = useAccount();
@@ -28,8 +29,6 @@ export function Navbar() {
       setConnected(true);
     }
   }, [address, connectors]);
-
-
 
   return (
     <>
@@ -56,7 +55,6 @@ export function Navbar() {
               <Link href="/dashboard">Dashboard</Link>
             </span>
           </div>
-          
         </div>
 
         {/* Center Logo */}
@@ -66,28 +64,33 @@ export function Navbar() {
 
         {/* Right: Icons or Wallet */}
         <div className="flex items-center space-x-6">
-          <div 
+          <div
             className="flex items-center space-x-2 bg-gray-800 hover:bg-gray-700 px-4 py-2 rounded-full transition-colors cursor-pointer"
             onClick={() => setIsCreateMarketModalOpen(true)} // Add click handler
           >
             <div className="w-6 h-6 rounded-full flex items-center justify-center text-sm">
               📈
             </div>
-            <button className="text-white text-base font-semibold">Create Market</button>
+            <button className="text-white text-base font-semibold">
+              Create Market
+            </button>
           </div>
-          <div 
-            className="flex items-center space-x-2 bg-gray-800 hover:bg-gray-700 px-4 py-2 rounded-full transition-colors cursor-pointer"
-          >
-            <div className="w-6 h-6 rounded-full flex items-center justify-center text-sm">
-              🌏
-            </div>
-            <Link href="/marketplace" className="text-white text-base font-semibold">Marketplace</Link>
+          <div className="flex items-center space-x-2 bg-gray-800 hover:bg-gray-700 px-4 py-2 rounded-full transition-colors cursor-pointer">
+            <Link
+              href="/marketplace"
+              className="text-white text-base font-semibold"
+            >
+              {" "}
+              <Activity />
+            </Link>
           </div>
           <div className="flex items-center space-x-2 bg-gray-800 hover:bg-gray-700 px-4 py-2 rounded-full transition-colors cursor-pointer">
             <div className="w-6 h-6 rounded-full bg-yellow-500 flex items-center justify-center text-sm">
               🪙
             </div>
-            <span className="text-white text-base font-semibold">{userPoints} XP</span>
+            <span className="text-white text-base font-semibold">
+              {userPoints} XP
+            </span>
           </div>
 
           <WalletBar />
@@ -154,12 +157,9 @@ export function Navbar() {
       )}
 
       {/* Create Market Modal */}
-       {isCreateMarketModalOpen && (
-        <CreateMarketModal
-          onClose={() => setIsCreateMarketModalOpen(false)}
-        />
+      {isCreateMarketModalOpen && (
+        <CreateMarketModal onClose={() => setIsCreateMarketModalOpen(false)} />
       )}
-   
     </>
   );
 }

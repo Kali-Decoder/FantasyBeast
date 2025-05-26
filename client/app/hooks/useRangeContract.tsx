@@ -11,11 +11,12 @@ import {
 } from "../constants";
 import { toast } from "react-hot-toast";
 import { Range_Market_Abi } from "../abi";
-import { placeBetBackend } from "../utils";
+import { createMarketBackend, placeBetBackend } from "../utils";
+import { useAccount } from "@starknet-react/core";
 
 export const useRangeContract = (connected: boolean, account: any) => {
   const contractRef = useRef<Contract | null>(null);
-
+  const { address } = useAccount();
   useEffect(() => {
     if (account && !contractRef.current) {
       contractRef.current = new Contract(
@@ -28,11 +29,13 @@ export const useRangeContract = (connected: boolean, account: any) => {
 
   const createPool = useCallback(
     async (
+
+      postURL: string,
       question: string,
       start_time: number,
       end_time: number,
       max_bettors: number,
-      amount: number
+      amount: number,      marketType:string
     ) => {
       if (!connected || !account) {
         console.warn("Not connected or account is missing");
@@ -91,6 +94,22 @@ export const useRangeContract = (connected: boolean, account: any) => {
           poolId = poolCreatedEvent.data[0]?.toString();
           console.log("Pool created with ID:", poolId);
         }
+        console.log(
+          address,
+          txHash,
+          marketType,
+          question,
+          postURL,
+          new Date(end_time * 1000)
+        );
+        await createMarketBackend(
+          address,
+          txHash,
+          marketType,
+          question,
+          postURL,
+          new Date(end_time * 1000)
+        );
 
         toast.success("Pool created successfully!", { id });
         return { receipt, poolId };
@@ -165,7 +184,11 @@ export const useRangeContract = (connected: boolean, account: any) => {
           };
           console.log("Bet placed:", betInfo);
         }
-        await placeBetBackend(betPlacedEvent.data[2]?.toString(), txHash, "range-based");
+        await placeBetBackend(
+          betPlacedEvent.data[2]?.toString(),
+          txHash,
+          "range-based"
+        );
         console.log("Bet placed backend call successful");
 
         toast.success("Bet placed successfully!", { id });

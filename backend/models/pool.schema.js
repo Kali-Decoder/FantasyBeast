@@ -1,6 +1,11 @@
 const mongoose = require("mongoose");
 const PoolSchema = new mongoose.Schema(
   {
+    poolId: {
+      type: String,
+      require: true,
+      unique: true,
+    },
     creator: {
       type: String,
       required: true,
