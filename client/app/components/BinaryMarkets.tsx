@@ -17,9 +17,9 @@ interface TransformedMarket {
   creator: string;
   totalBets: number;
   startTime: number;
-  endTime: number;
-  endTimeTimestamp: number; // Add raw timestamp for filtering
-  endTimeFormatted: string; // Add formatted date string
+  endTime: string;
+  endTimeTimestamp: number;
+  endTimeFormatted: string;
   maxBettors: number;
   status: any;
   finalOutcome: any;
@@ -38,87 +38,168 @@ const hexToString = (hex: string): string => {
   if (!hex || hex === "0x0") return "";
   try {
     const cleanHex = hex.replace("0x", "");
+    // Ensure even length
+    const evenHex = cleanHex.length % 2 === 0 ? cleanHex : "0" + cleanHex;
     let str = "";
-    for (let i = 0; i < cleanHex.length; i += 2) {
-      const hexChar = cleanHex.substr(i, 2);
+    for (let i = 0; i < evenHex.length; i += 2) {
+      const hexChar = evenHex.substr(i, 2);
       const charCode = parseInt(hexChar, 16);
-      if (charCode !== 0) {
+      if (charCode !== 0 && charCode >= 32 && charCode <= 126) {
         str += String.fromCharCode(charCode);
       }
     }
     return str;
-  } catch {
+  } catch (error) {
+    console.warn("Error converting hex to string:", error);
     return hex;
   }
 };
 
-// Utility function to convert hex to number
-const hexToNumber = (hex: string): number => {
-  if (!hex) return 0;
-  return parseInt(hex, 16);
+// Utility function to convert hex to number with error handling
+const hexToNumber = (hex: string | number | bigint): number => {
+  if (hex === null || hex === undefined) return 0;
+  if (typeof hex === "number") return hex;
+  if (typeof hex === "bigint") return Number(hex);
+  if (typeof hex === "string") {
+    if (!hex || hex === "0x0") return 0;
+    try {
+      return parseInt(hex, 16);
+    } catch (error) {
+      console.warn("Error converting hex to number:", error);
+      return 0;
+    }
+  }
+  return 0;
 };
 
-// Utility function to format timestamp
+// Utility function to format timestamp with better error handling
 const formatTimestamp = (
-  timestamp: number
+  timestamp: bigint | number | string
 ): { formatted: string; raw: number } => {
-  if (!timestamp || timestamp === 0) {
+  if (!timestamp || timestamp === 0 || timestamp === "0x0") {
     return { formatted: "Not set", raw: 0 };
   }
 
-  const ms = timestamp * 1000;
-  const formatted = new Date(ms).toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-  });
+  try {
+    let ms: number;
+    if (typeof timestamp === "bigint") {
+      ms = Number(timestamp) * 1000;
+    } else if (typeof timestamp === "string") {
+      ms = parseInt(timestamp, 16) * 1000;
+    } else {
+      ms = Number(timestamp) * 1000;
+    }
 
-  return { formatted, raw: ms };
+    if (isNaN(ms) || ms <= 0) {
+      return { formatted: "Invalid date", raw: 0 };
+    }
+
+    const formatted = new Date(ms).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    });
+
+    return { formatted, raw: ms };
+  } catch (error) {
+    console.warn("Error formatting timestamp:", error);
+    return { formatted: "Invalid date", raw: 0 };
+  }
 };
 
-// Transform blockchain data to component format
+// Transform blockchain data to component format with better error handling
 const transformMarketData = (blockchainMarkets: any[]): TransformedMarket[] => {
-  return blockchainMarkets.map((market) => {
-    const { market_id, market_info } = market;
+  if (!Array.isArray(blockchainMarkets)) {
+    console.warn("blockchainMarkets is not an array:", blockchainMarkets);
+    return [];
+  }
 
-    const yesAmount = hexToNumber(market_info.yes_amount);
-    const noAmount = hexToNumber(market_info.no_amount);
-    const totalAmount = yesAmount + noAmount;
+  return blockchainMarkets
+    .map((market, index) => {
+      try {
+        if (!market || typeof market !== "object") {
+          console.warn(`Invalid market data at index ${index}:`, market);
+          return null;
+        }
 
-    // Calculate percentages
-    const yesPercentage =
-      totalAmount > 0 ? Math.round((yesAmount / totalAmount) * 100) : 0;
-    const noPercentage =
-      totalAmount > 0 ? Math.round((noAmount / totalAmount) * 100) : 0;
+        const { market_id, market_info } = market;
 
-    const endTime = hexToNumber(market_info.end_time);
-    console.log("End time:", endTime,market_info.end_time);
-    const { formatted: endTimeFormatted, raw: endTimeTimestamp } =
-      formatTimestamp(endTime);
+        if (!market_info || typeof market_info !== "object") {
+          console.warn(`Invalid market_info at index ${index}:`, market_info);
+          return null;
+        }
 
-    return {
-      question:
-        hexToString(BigInt(market_info.question).toString(16)) ||
-        `Market ${market_id}`,
-      tvl: totalAmount.toLocaleString(),
-      yesPercentage,
-      noPercentage,
-      url: "#", // You can modify this based on your needs
-      marketId: market_id,
-      description:
-        hexToString(BigInt(market_info.description).toString(16)) ||
-        "No description available",
-      creator: market_info.creator,
-      totalBets: hexToNumber(market_info.total_bets),
-      startTime: hexToNumber(market_info.start_time),
-      endTime: endTime,
-      endTimeTimestamp: endTimeTimestamp,
-      endTimeFormatted: endTimeFormatted,
-      maxBettors: hexToNumber(market_info.max_bettors),
-      status: market_info.status,
-      finalOutcome: market_info.final_outcome,
-    };
-  });
+        const yesAmount = hexToNumber(market_info.yes_amount);
+        const noAmount = hexToNumber(market_info.no_amount);
+        const totalAmount = yesAmount + noAmount;
+
+        // Calculate percentages with safety checks
+        let yesPercentage = 0;
+        let noPercentage = 0;
+        if (totalAmount > 0) {
+          yesPercentage = Math.round((yesAmount / totalAmount) * 100);
+          noPercentage = Math.round((noAmount / totalAmount) * 100);
+          
+          // Ensure percentages add up to 100
+          if (yesPercentage + noPercentage !== 100) {
+            noPercentage = 100 - yesPercentage;
+          }
+        }
+
+        const { formatted: endTime, raw: endTimeTimestamp } = formatTimestamp(
+          market_info.end_time
+        );
+
+        // Better question extraction
+        let question = "";
+        if (market_info.question) {
+          if (typeof market_info.question === "string") {
+            question = hexToString(market_info.question);
+          } else if (typeof market_info.question === "bigint" || typeof market_info.question === "number") {
+            question = hexToString(BigInt(market_info.question).toString(16));
+          }
+        }
+        if (!question) {
+          question = `Market ${market_id || index}`;
+        }
+
+        // Better description extraction
+        let description = "";
+        if (market_info.description) {
+          if (typeof market_info.description === "string") {
+            description = hexToString(market_info.description);
+          } else if (typeof market_info.description === "bigint" || typeof market_info.description === "number") {
+            description = hexToString(BigInt(market_info.description).toString(16));
+          }
+        }
+        if (!description) {
+          description = "No description available";
+        }
+
+        return {
+          question,
+          tvl: totalAmount.toLocaleString(),
+          yesPercentage,
+          noPercentage,
+          url: "#",
+          marketId: String(market_id || index),
+          description,
+          creator: market_info.creator || "Unknown",
+          totalBets: hexToNumber(market_info.total_bets),
+          startTime: hexToNumber(market_info.start_time),
+          endTime: endTime,
+          endTimeTimestamp: endTimeTimestamp,
+          endTimeFormatted: endTime,
+          maxBettors: hexToNumber(market_info.max_bettors),
+          status: market_info.status,
+          finalOutcome: market_info.final_outcome,
+        };
+      } catch (error) {
+        console.error(`Error transforming market at index ${index}:`, error);
+        return null;
+      }
+    })
+    .filter((market): market is TransformedMarket => market !== null);
 };
 
 const BinaryMarkets: React.FC<BinaryMarketsProps> = ({
@@ -129,7 +210,7 @@ const BinaryMarkets: React.FC<BinaryMarketsProps> = ({
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [marketsCount, setMarketsCount] = useState<number>(0);
-  const [filter, setFilter] = useState<FilterType>("all");
+  const [filter, setFilter] = useState<FilterType>("active");
 
   // Filter markets based on end time
   const filterMarkets = useCallback(
@@ -138,8 +219,8 @@ const BinaryMarkets: React.FC<BinaryMarketsProps> = ({
       filterType: FilterType
     ): TransformedMarket[] => {
       const now = Date.now();
-      const oneDayInMs = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
-      const threeDaysInMs = 3 * oneDayInMs; // 3 days in milliseconds
+      const oneDayInMs = 24 * 60 * 60 * 1000;
+      const threeDaysInMs = 3 * oneDayInMs;
 
       switch (filterType) {
         case "active":
@@ -201,10 +282,14 @@ const BinaryMarkets: React.FC<BinaryMarketsProps> = ({
       setLoading(true);
       setError(null);
 
-      // Fetch markets count
-      const count = await getMarketsCount();
-      if (count !== null) {
-        setMarketsCount(count);
+      // Fetch markets count with error handling
+      try {
+        const count = await getMarketsCount();
+        if (typeof count === "number" && count >= 0) {
+          setMarketsCount(count);
+        }
+      } catch (countError) {
+        console.warn("Error fetching markets count:", countError);
       }
 
       // Fetch all markets
@@ -213,13 +298,20 @@ const BinaryMarkets: React.FC<BinaryMarketsProps> = ({
       if (marketData && Array.isArray(marketData)) {
         const transformedMarkets = transformMarketData(marketData);
         setMarkets(transformedMarkets);
-      } else {
+        
+        if (transformedMarkets.length === 0 && marketData.length > 0) {
+          setError("Markets data could not be processed");
+        }
+      } else if (marketData === null) {
         setMarkets([]);
         setError("No markets data available");
+      } else {
+        setMarkets([]);
+        setError("Invalid markets data format");
       }
     } catch (err) {
       console.error("Error fetching markets:", err);
-      setError("Failed to fetch markets data");
+      setError(err instanceof Error ? err.message : "Failed to fetch markets data");
       setMarkets([]);
     } finally {
       setLoading(false);
@@ -267,12 +359,12 @@ const BinaryMarkets: React.FC<BinaryMarketsProps> = ({
           🎮 Binary Markets on Starknet
         </h2>
         <div className="flex flex-col justify-center items-center min-h-[400px] gap-4">
-          <div className="text-red-400 text-xl">{error}</div>
+          <div className="text-red-400 text-xl text-center max-w-md">{error}</div>
           <button
             onClick={refreshMarkets}
             className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors flex items-center gap-2"
           >
-            <RefreshCw className="w-4 h-4" />
+            <RefreshCw  />
             
           </button>
         </div>
@@ -293,11 +385,11 @@ const BinaryMarkets: React.FC<BinaryMarketsProps> = ({
         {/* Filter Tabs */}
         <div className="flex flex-wrap justify-center gap-2 mb-6">
           {[
-            {
-              key: "all" as FilterType,
-              label: "All Markets",
-              count: marketCounts.all,
-            },
+            // {
+            //   key: "all" as FilterType,
+            //   label: "All Markets",
+            //   count: marketCounts.all,
+            // },
             {
               key: "active" as FilterType,
               label: "Active",
@@ -340,8 +432,8 @@ const BinaryMarkets: React.FC<BinaryMarketsProps> = ({
             disabled={loading}
             className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors text-sm flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <RefreshCw />
-            
+            <RefreshCw  />
+       
           </button>
         </div>
       </div>
@@ -395,7 +487,7 @@ const BinaryMarkets: React.FC<BinaryMarketsProps> = ({
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
-          {filteredMarkets.map((market, i) => (
+          {filteredMarkets.slice(0,6).map((market, i) => (
             <BinaryMarketCard key={market.marketId || i} market={market} />
           ))}
         </div>

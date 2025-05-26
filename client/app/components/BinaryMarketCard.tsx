@@ -2,34 +2,10 @@
 import React from "react";
 import { XEmbed } from "react-social-media-embed";
 
-// Type definitions
-interface MarketData {
-  question: string;
-  tvl: string;
-  yesPercentage: number;
-  noPercentage: number;
-  url?: string;
-  marketId?: string;
-  description?: string;
-  creator?: string;
-  totalBets?: number;
-  startTime?: number;
-  endTime?: number;
-  maxBettors?: number;
-  status?: any;
-  finalOutcome?: any;
-}
 
-interface BinaryMarketCardProps {
-  market: MarketData;
-  setShowBinaryModal?: (show: boolean) => void;
-  setSelectSingleBinaryMarket?: (selection: {
-    market: MarketData;
-    betStatus: "yes" | "no";
-  }) => void;
-}
 
-const BinaryMarketCard: React.FC<BinaryMarketCardProps> = ({
+
+const BinaryMarketCard: React.FC<any> = ({
   market,
   setShowBinaryModal,
   setSelectSingleBinaryMarket,

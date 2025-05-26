@@ -159,7 +159,8 @@ export const createMarketBackend = async (
   marketType: any,
   question: any,
   postURL: any,
-  endtime: any
+  endtime: any,
+  pool_id: any
 ) => {
   try {
     const url = "/pools";
@@ -170,7 +171,8 @@ export const createMarketBackend = async (
       marketType,
       question,
       url:postURL,
-      endTime:endtime
+      endTime:endtime,
+      poolId: pool_id,
     };
 
     const headers = {

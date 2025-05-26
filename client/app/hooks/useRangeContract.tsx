@@ -52,7 +52,7 @@ export const useRangeContract = (connected: boolean, account: any) => {
       console.log({ question, start_time, end_time, max_bettors, amount });
 
       try {
-        const _amount = BigInt(amount);
+        const _amount = (amount);
         const multiCall = await account.execute([
           {
             contractAddress: STRK_TOKEN_ADDRESS,
@@ -108,7 +108,8 @@ export const useRangeContract = (connected: boolean, account: any) => {
           marketType,
           question,
           postURL,
-          new Date(end_time * 1000)
+          new Date(end_time * 1000),
+          poolId
         );
 
         toast.success("Pool created successfully! and you got 30 points", { id });
@@ -119,7 +120,7 @@ export const useRangeContract = (connected: boolean, account: any) => {
         return null;
       }
     },
-    [connected, account]
+    [connected, account, address]
   );
 
   const placeBet = useCallback(
@@ -138,7 +139,7 @@ export const useRangeContract = (connected: boolean, account: any) => {
       const id = toast.loading("Placing bet...");
 
       try {
-        const _amount = BigInt(String(bet_amount));
+        const _amount = (String(bet_amount));
         const multiCall = await account.execute([
           {
             contractAddress: STRK_TOKEN_ADDRESS,

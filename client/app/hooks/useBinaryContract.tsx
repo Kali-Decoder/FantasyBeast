@@ -120,7 +120,7 @@ export const useBinaryMarketContract = (connected: boolean, account: any) => {
       });
 
       try {
-        const _amount = BigInt(initial_stake);
+        const _amount = (initial_stake);
         const multiCall = await account.execute([
           {
             contractAddress: STRK_TOKEN_ADDRESS,
@@ -172,7 +172,8 @@ export const useBinaryMarketContract = (connected: boolean, account: any) => {
           marketType,
           question,
           postURL,
-          new Date(end_time * 1000)
+          new Date(end_time * 1000),
+          marketId
         );
 
         toast.success("Market created successfully! and you get 30 point", { id });
@@ -203,7 +204,7 @@ export const useBinaryMarketContract = (connected: boolean, account: any) => {
       const id = toast.loading("Placing bet...");
 
       try {
-        const _amount = BigInt(String(bet_amount));
+        const _amount = (String(bet_amount));
         const multiCall = await account.execute([
           {
             contractAddress: STRK_TOKEN_ADDRESS,

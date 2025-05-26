@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 "use client"
 import React from "react";
@@ -21,7 +22,7 @@ interface Market {
 interface RangeMarketCardProps {
   market: Market;
   setShowRangeModal?: (show: boolean) => void;
-  setSelectSingleRangeMarket?: (market: Market) => void;
+  setSelectSingleRangeMarket?: (market: any) => void;
 }
 
 const RangeMarketCard: React.FC<RangeMarketCardProps> = ({ 
@@ -43,7 +44,7 @@ const RangeMarketCard: React.FC<RangeMarketCardProps> = ({
       <div className="rounded-md overflow-hidden mb-4 h-[180px] sm:h-[200px] md:h-[220px]">
         <XEmbed
           style={{ borderRadius: "0px", height: "100%" }}
-          url={market.url}
+          url={market.url || "https://x.com/vaibhavgeek/status/1910290774614523928"}
           width="100%"
         />
       </div>

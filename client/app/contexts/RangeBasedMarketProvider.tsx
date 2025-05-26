@@ -10,9 +10,8 @@ import React, {
   useState,
   useRef,
 } from "react";
-import { CallData } from "starknet";
 import { useAccount, useConnect } from "@starknet-react/core";
-import { postWithHeaders, getWithHeaders, api } from "../config";
+import { getWithHeaders } from "../config";
 import {
   RangeBasedProviderProps,
   Status,
@@ -98,7 +97,7 @@ export function RangeBasedProvider({ children }: RangeBasedProviderProps) {
     try {
       setStatus("loading");
       const data = await getWithHeaders(`/transactions`, {
-        "x-user-address": address!,
+        "x-user-address": address || "0x06a54b39f32c5f5309141f2ca99818201a359dd96ae0ec12e36fdd180470fc1a",
       });
       
       console.log("Transactions history:", data.data);
@@ -121,7 +120,7 @@ export function RangeBasedProvider({ children }: RangeBasedProviderProps) {
       }
       return [];
     }
-  }, [address, isConnected, validateAddress, handleError]);
+  }, [address, validateAddress, handleError]);
 
   const getLeaderboard = useCallback(async () => {
     if (!validateAddress()) {
@@ -130,7 +129,7 @@ export function RangeBasedProvider({ children }: RangeBasedProviderProps) {
 
     try {
       const data = await getWithHeaders(`/leaderboard`, {
-        "x-user-address": address!,
+        "x-user-address": address || "0x06a54b39f32c5f5309141f2ca99818201a359dd96ae0ec12e36fdd180470fc1a",
       });
       return data?.data || [];
     } catch (error: any) {
@@ -142,7 +141,7 @@ export function RangeBasedProvider({ children }: RangeBasedProviderProps) {
       }
       return [];
     }
-  }, [address, isConnected, validateAddress]);
+  }, [address, validateAddress]);
 
   const getPoints = useCallback(async () => {
     if (!validateAddress()) {
@@ -151,7 +150,7 @@ export function RangeBasedProvider({ children }: RangeBasedProviderProps) {
 
     try {
       const data = await getWithHeaders(`/users`, {
-        "x-user-address": address!,
+        "x-user-address": address || "0x06a54b39f32c5f5309141f2ca99818201a359dd96ae0ec12e36fdd180470fc1a",
       });
       
       const points = data?.data?.xpPoints || 0;
@@ -168,7 +167,7 @@ export function RangeBasedProvider({ children }: RangeBasedProviderProps) {
       }
       return 0;
     }
-  }, [address, isConnected, validateAddress, handleError]);
+  }, [address, validateAddress, handleError]);
 
   // Function to manually refresh data
   const refreshData = useCallback(async () => {
