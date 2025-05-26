@@ -71,7 +71,7 @@ const Address: React.FC<AddressProps> = ({ isMobile = false }) => {
                 ${isMobile ? "text-base" : "text-sm sm:text-base"}
               `}
             >
-              {address ? shortenAddress(address) : ""} | {username}
+              {address ? shortenAddress(address) : ""} | {username}.Beast
             </span>
             {address && (
               <>

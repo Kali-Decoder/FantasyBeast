@@ -7,7 +7,7 @@ import ControllerConnector from "@cartridge/connector/controller";
 import Link from "next/link";
 import CreateMarketModal from "./CreateMarketModal";
 import { useRangeBased } from "../contexts/RangeBasedMarketProvider";
-import { Activity } from "lucide-react";
+import { Activity, List } from "lucide-react";
 
 export function Navbar() {
   const [searchFocused, setSearchFocused] = useState(false);
@@ -50,9 +50,9 @@ export function Navbar() {
           </div>
 
           <div className="flex items-center space-x-2 text-gray-400 cursor-pointer hover:text-gray-300 transition-colors">
-            <img src="/icons/store.svg" alt="Store" className="w-6 h-6" />
+            <List />
             <span className="font-semibold text-lg">
-              <Link href="/dashboard">Dashboard</Link>
+              <Link href="/dashboard">Transactions</Link>
             </span>
           </div>
         </div>
@@ -147,8 +147,11 @@ export function Navbar() {
             <a href="#" className="text-xl text-white hover:text-purple-400">
               Leaderboard
             </a>
-            <a href="#" className="text-xl text-white hover:text-purple-400">
-              About
+            <a
+              href="/dashboard"
+              className="text-xl text-white hover:text-purple-400"
+            >
+              Transactions
             </a>
 
             <WalletBar />
