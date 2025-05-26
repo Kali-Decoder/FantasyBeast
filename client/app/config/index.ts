@@ -1,11 +1,11 @@
-import axios, { AxiosInstance, AxiosRequestConfig } from "axios";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import axios, {  AxiosRequestConfig } from "axios";
 
 // Base URL for the backend (Update with your actual backend URL)
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/api";
 // Create a default Axios instance for normal JSON requests
 const api = axios.create({
   baseURL: BASE_URL,
-  timeout: 20000, // Timeout after 10 seconds
   headers: {
     "Content-Type": "application/json",
   },

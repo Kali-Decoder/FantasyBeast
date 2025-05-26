@@ -56,9 +56,9 @@ const BinaryMarketCard: React.FC<BinaryMarketCardProps> = ({
 
   return (
     <>
-      <div className="bg-gradient-to-br from-blue-500 to-purple-500 rounded-3xl p-6 shadow-xl hover:scale-105 transition-transform font-techno text-white flex flex-col justify-between">
+      <div className="bg-gradient-to-br from-blue-500 to-purple-500 rounded-3xl p-6 shadow-xl hover:scale-105 transition-transform font-techno text-black flex flex-col justify-between h-full min-h-[420px] max-w-md w-full mx-auto">
         <div className="mb-4">
-          <div className="text-white/80 h-[400px] rounded-md overflow-y-auto text-xs mb-4">
+          <div className="rounded-md overflow-hidden mb-4 h-[180px] sm:h-[200px] md:h-[220px]">
             <XEmbed
               style={{ borderRadius: "0px", height: "100%" }}
               url={getEmbedUrl()}
@@ -92,7 +92,7 @@ const BinaryMarketCard: React.FC<BinaryMarketCardProps> = ({
             )} */}
           </div>
 
-          <div className="bg-black mt-4 backdrop-blur-sm rounded-full px-3 py-1 flex items-center">
+          <div className="bg-black mt-4 text-white backdrop-blur-sm rounded-full px-3 py-1 flex items-center">
             <span className="text-sm mr-1">🔐</span>
             <span className="font-bold">Amount Locked : {market.tvl} STRK</span>
           </div>

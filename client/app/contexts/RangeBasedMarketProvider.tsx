@@ -8,18 +8,12 @@ import React, {
   useEffect,
   useMemo,
   useState,
+  useRef,
 } from "react";
-import { cairo, CallData } from "starknet";
+import { CallData } from "starknet";
 import { useAccount, useConnect } from "@starknet-react/core";
-import { toast } from "react-hot-toast";
 import { postWithHeaders, getWithHeaders, api } from "../config";
-import {
-  ETH_TOKEN_ADDRESS,
-  STRK_TOKEN_ADDRESS,
-  provider,
-  RANGE_BASED_MARKET,
-  range_based_contract,
-} from "../constants";
+import { range_based_contract } from "../constants";
 import {
   RangeBasedContextValue,
   RangeBasedProviderProps,
@@ -28,9 +22,7 @@ import {
 import ControllerConnector from "@cartridge/connector/controller";
 
 // Create the context with an undefined initial value
-const RangeBasedContext = createContext<RangeBasedContextValue | undefined>(
-  undefined
-);
+const RangeBasedContext = createContext<any | undefined>(undefined);
 
 // Custom hook to use the context
 export function useRangeBased() {
@@ -47,14 +39,29 @@ export function RangeBasedProvider({ children }: RangeBasedProviderProps) {
   const { account, isConnected, address } = useAccount();
   const [status, setStatus] = useState<Status>("idle");
   const [error, setError] = useState<string | null>(null);
-  const { connect, connectors } = useConnect();
+  const { connectors } = useConnect();
   const [username, setUsername] = useState<string | undefined>();
   const [connected, setConnected] = useState(false);
   const [transactions, setTransactions] = useState<any[]>([]);
   const [userPoints, setUserPoints] = useState<number>(0);
+  const [isLoading, setIsLoading] = useState(false);
 
+  // Ref to track if initial data has been fetched
+  const initialDataFetched = useRef(false);
+
+  // Set up connection status when address changes
   useEffect(() => {
-    if (!address) return;
+    if (!address) {
+      setConnected(false);
+      setUsername(undefined);
+      // Reset data when disconnected
+      setTransactions([]);
+      setUserPoints(0);
+      setError(null);
+      initialDataFetched.current = false;
+      return;
+    }
+
     const controller = connectors.find((c) => c instanceof ControllerConnector);
     if (controller) {
       controller.username()?.then((n) => setUsername(n));
@@ -72,364 +79,178 @@ export function RangeBasedProvider({ children }: RangeBasedProviderProps) {
     return errorMessage;
   }, []);
 
-  // Create pool function - includes approving the token transfer
-  const createPool = useCallback(
-    async (
-      question: string,
-      start_time: number,
-      end_time: number,
-      max_bettors: number,
-      amount: number
-    ) => {
-      if (!connected || !account) {
-        throw new Error("Account not connected");
-      }
-
-      console.log({ question, start_time, end_time, max_bettors, amount });
-
-      const id = toast.loading("Creating pool...");
-      try {
-        setStatus("loading");
-        setError(null);
-
-        const _amount = BigInt(amount);
-        const multiCall = await account.execute([
-          {
-            contractAddress: STRK_TOKEN_ADDRESS,
-            entrypoint: "approve",
-            calldata: CallData.compile({
-              spender: RANGE_BASED_MARKET,
-              amount: cairo.uint256(_amount),
-            }),
-          },
-          {
-            contractAddress: RANGE_BASED_MARKET,
-            entrypoint: "create_pool",
-            calldata: CallData.compile({
-              question,
-              start_time,
-              end_time,
-              max_bettors,
-              initial_stake: amount,
-            }),
-          },
-        ]);
-
-        const res = await provider.waitForTransaction(
-          multiCall?.transaction_hash || ""
-        );
-
-        setStatus("success");
-        toast.success("Pool created successfully!", { id });
-        return res;
-      } catch (error) {
-        console.error("Error creating pool:", error);
-        toast.error("Error creating pool", { id });
-        handleError(error);
-        throw error;
-      }
-    },
-    [account, connected, handleError]
-  );
-
-  const placeBet = useCallback(
-    async (pool_id: number, predicted_value: number, bet_amount: number) => {
-      if (!connected || !account) {
-        throw new Error("Account not connected");
-      }
-
-      const id = toast.loading("Placing bet...");
-      try {
-        setStatus("loading");
-        setError(null);
-
-        const _amount = BigInt(bet_amount);
-        const multiCall = await account.execute([
-          {
-            contractAddress: STRK_TOKEN_ADDRESS,
-            entrypoint: "approve",
-            calldata: CallData.compile({
-              spender: RANGE_BASED_MARKET,
-              amount: cairo.uint256(_amount),
-            }),
-          },
-          {
-            contractAddress: RANGE_BASED_MARKET,
-            entrypoint: "place_bet",
-            calldata: CallData.compile({
-              pool_id,
-              predicted_value,
-              bet_amount,
-            }),
-          },
-        ]);
-
-        const res = await provider.waitForTransaction(
-          multiCall?.transaction_hash || ""
-        );
-
-        setStatus("success");
-        toast.success("Bet placed successfully!", { id });
-        return res;
-      } catch (error) {
-        console.error("Error placing bet:", error);
-        toast.error("Error placing bet", { id });
-        handleError(error);
-        throw error;
-      }
-    },
-    [account, connected, handleError]
-  );
-
-  const setResult = useCallback(
-    async (pool_id: number, result: number) => {
-      if (!connected || !account) {
-        throw new Error("Account not connected");
-      }
-
-      const id = toast.loading("Setting result...");
-      try {
-        setStatus("loading");
-        setError(null);
-
-        const multiCall = await account.execute([
-          {
-            contractAddress: RANGE_BASED_MARKET,
-            entrypoint: "set_result",
-            calldata: CallData.compile({
-              pool_id,
-              result,
-            }),
-          },
-        ]);
-
-        const res = await provider.waitForTransaction(
-          multiCall?.transaction_hash || ""
-        );
-
-        setStatus("success");
-        toast.success("Result set successfully!", { id });
-        return res;
-      } catch (error) {
-        console.error("Error setting result:", error);
-        toast.error("Error setting result", { id });
-        handleError(error);
-        throw error;
-      }
-    },
-    [account, connected, handleError]
-  );
-
-  const claimReward = useCallback(
-    async (pool_id: number) => {
-      if (!connected || !account) {
-        throw new Error("Account not connected");
-      }
-
-      const id = toast.loading("Claiming reward...");
-      try {
-        setStatus("loading");
-        setError(null);
-
-        const multiCall = await account.execute([
-          {
-            contractAddress: RANGE_BASED_MARKET,
-            entrypoint: "claim_reward",
-            calldata: CallData.compile({
-              pool_id,
-            }),
-          },
-        ]);
-
-        const res = await provider.waitForTransaction(
-          multiCall?.transaction_hash || ""
-        );
-
-        setStatus("success");
-        toast.success("Reward claimed successfully!", { id });
-        return res;
-      } catch (error) {
-        console.error("Error claiming reward:", error);
-        toast.error("Error claiming reward", { id });
-        handleError(error);
-        throw error;
-      }
-    },
-    [account, connected, handleError]
-  );
-
-  const getTransactionsHistory = async () => {
-    try {
-      //  if(!address) {
-      //   throw new Error("No address connected");
-      // }
-
-      let data = await getWithHeaders(`/transactions`, {
-        "x-user-address": "0xcfa038455b54714821f291814071161c9870B891",
-      });
-      console.log("Transactions history:", data.data);
-      setTransactions(data.data.length ? data.data : []);
-    } catch (error) {
-      console.log("Error fetching transactions history:", error);
+  // Validate address before making API calls
+  const validateAddress = useCallback(() => {
+    if (!address) {
+      console.warn("No wallet address available");
+      return false;
     }
-  };
+    if (!isConnected) {
+      console.warn("Wallet not connected");
+      return false;
+    }
+    return true;
+  }, [address, isConnected]);
 
+  // Memoize the functions to prevent unnecessary re-renders
+  const getTransactionsHistory = useCallback(async () => {
+    if (!validateAddress()) {
+      return [];
+    }
 
-  const getLeaderboard = async () => {
     try {
-      // if (!address) {
-      //   throw new Error("No address connected");
-      // }
+      setStatus("loading");
+      const data = await getWithHeaders(`/transactions`, {
+        "x-user-address": address!,
+      });
+      
+      console.log("Transactions history:", data.data);
+      const transactionsData = data.data?.length ? data.data : [];
+      setTransactions(transactionsData);
+      setStatus("success");
+      return transactionsData;
+    } catch (error: any) {
+      console.error("Error fetching transactions history:", error);
+      
+      // Handle specific HTTP errors
+      if (error.response?.status === 401) {
+        handleError("Authentication failed. Please reconnect your wallet.");
+      } else if (error.response?.status === 403) {
+        handleError("Access denied. Check your permissions.");
+      } else if (error.response?.status === 404) {
+        handleError("Transactions endpoint not found.");
+      } else {
+        handleError(error);
+      }
+      return [];
+    }
+  }, [address, isConnected, validateAddress, handleError]);
 
-      let data = await getWithHeaders(`/leaderboard`, {
-        "x-user-address": "0xcfa038455b54714821f291814071161c9870B891",
+  const getLeaderboard = useCallback(async () => {
+    if (!validateAddress()) {
+      return [];
+    }
+
+    try {
+      const data = await getWithHeaders(`/leaderboard`, {
+        "x-user-address": address!,
       });
       return data?.data || [];
-    } catch (error) {
-      console.error("Error fetching points:", error);
-      return 0; // Return 0 or handle error as needed
+    } catch (error: any) {
+      console.error("Error fetching leaderboard:", error);
+      
+      // Handle specific HTTP errors
+      if (error.response?.status === 401) {
+        console.error("Authentication failed for leaderboard");
+      }
+      return [];
     }
-  };
-  const getPoints = async () => {
+  }, [address, isConnected, validateAddress]);
+
+  const getPoints = useCallback(async () => {
+    if (!validateAddress()) {
+      return 0;
+    }
+
     try {
-      // if (!address) {
-      //   throw new Error("No address connected");
-      // }
-
-      let data = await getWithHeaders(`/users`, {
-        "x-user-address": "0xcfa038455b54714821f291814071161c9870B891",
+      const data = await getWithHeaders(`/users`, {
+        "x-user-address": address!,
       });
-      setUserPoints(data?.data?.xpPoints || 0);
-    } catch (error) {
+      
+      const points = data?.data?.xpPoints || 0;
+      setUserPoints(points);
+      return points;
+    } catch (error: any) {
       console.error("Error fetching points:", error);
-      return 0; // Return 0 or handle error as needed
+      
+      // Handle specific HTTP errors
+      if (error.response?.status === 401) {
+        handleError("Authentication failed. Please reconnect your wallet.");
+      } else {
+        handleError(error);
+      }
+      return 0;
     }
-  };
-  const getPoolDetail = useCallback(
-    async (pool_id: number): Promise<any | undefined> => {
-      try {
-        if (!range_based_contract) {
-          throw new Error("Contract not available");
-        }
+  }, [address, isConnected, validateAddress, handleError]);
 
-        setStatus("loading");
-        setError(null);
+  // Function to manually refresh data
+  const refreshData = useCallback(async () => {
+    if (!validateAddress()) {
+      console.log("Cannot refresh data: wallet not connected or address missing");
+      return;
+    }
 
-        const response = await range_based_contract.get_pool(
-          CallData.compile({
-            pool_id: pool_id,
-          })
-        );
+    setIsLoading(true);
+    setError(null);
+    
+    try {
+      await Promise.all([getTransactionsHistory(), getPoints()]);
+    } catch (error) {
+      console.error("Error refreshing data:", error);
+      handleError(error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [getTransactionsHistory, getPoints, validateAddress, handleError]);
 
-        setStatus("success");
-
-        return response as any;
-      } catch (err) {
-        handleError(err);
-        return undefined;
-      }
-    },
-    [handleError]
-  );
-
-  const getPrediction = useCallback(
-    async (
-      pool_id: number,
-      prediction_id: number
-    ): Promise<any | undefined> => {
-      try {
-        if (!range_based_contract) {
-          throw new Error("Contract not available");
-        }
-
-        setStatus("loading");
-        setError(null);
-
-        const response = await range_based_contract.get_prediction(
-          CallData.compile({
-            pool_id: pool_id,
-            prediction_id: prediction_id,
-          })
-        );
-
-        setStatus("success");
-
-        return response as any;
-      } catch (err) {
-        handleError(err);
-        return undefined;
-      }
-    },
-    [handleError]
-  );
-
-  // Get contract balance
-  const getContractBalance = useCallback(
-    async (tokenAddress: string): Promise<bigint | undefined> => {
-      try {
-        if (!range_based_contract) {
-          throw new Error("Contract not available");
-        }
-
-        setStatus("loading");
-        setError(null);
-
-        const response = await range_based_contract.get_contract_balance(
-          CallData.compile({
-            token: tokenAddress,
-          })
-        );
-
-        setStatus("success");
-        return BigInt(response.toString());
-      } catch (err) {
-        handleError(err);
-        return undefined;
-      }
-    },
-    [handleError]
-  );
-
+  // Fetch initial data when address becomes available and wallet is connected
   useEffect(() => {
-    // Fetch contract balance on mount
-    getTransactionsHistory();
-    getPoints();
-  }, [getTransactionsHistory]);
+    if (address && isConnected && !initialDataFetched.current) {
+      console.log("Fetching initial data for address:", address);
+      initialDataFetched.current = true;
+      refreshData();
+    }
+  }, [address, isConnected, refreshData]);
+
+  // Reset initial fetch flag when address changes
+  useEffect(() => {
+    initialDataFetched.current = false;
+  }, [address]);
+
+  // Function to retry failed requests
+  const retryLastOperation = useCallback(async () => {
+    setError(null);
+    await refreshData();
+  }, [refreshData]);
 
   // Create value object for the context that matches RangeBasedContextValue
   const value = useMemo(
-    (): RangeBasedContextValue => ({
+    (): any => ({
       // Functions
-      createPool,
-      placeBet,
-      setResult,
-      claimReward,
-      getPoolDetail,
-      getPrediction,
-      getContractBalance,
+      getLeaderboard,
+      getTransactionsHistory,
+      getPoints,
+      refreshData,
+      retryLastOperation,
 
       // State
       status,
       error,
-      isConnected,
+      isConnected: connected,
       transactions,
       userPoints,
-      getLeaderboard
+      username,
+      address,
+      isLoading,
+
+      // Utility
+      validateAddress,
     }),
     [
-      createPool,
-      placeBet,
-      setResult,
-      claimReward,
-      getPoolDetail,
-      getPrediction,
-      getContractBalance,
+      getLeaderboard,
+      getTransactionsHistory,
+      getPoints,
+      refreshData,
+      retryLastOperation,
       status,
       error,
-      isConnected,
+      connected,
       transactions,
       userPoints,
-      getLeaderboard
+      username,
+      address,
+      isLoading,
+      validateAddress,
     ]
   );
 

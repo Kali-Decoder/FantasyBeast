@@ -11,6 +11,7 @@ import {
 } from "../constants";
 import { toast } from "react-hot-toast";
 import { Range_Market_Abi } from "../abi";
+import { placeBetBackend } from "../utils";
 
 export const useRangeContract = (connected: boolean, account: any) => {
   const contractRef = useRef<Contract | null>(null);
@@ -105,7 +106,7 @@ export const useRangeContract = (connected: boolean, account: any) => {
   const placeBet = useCallback(
     async (pool_id: number, predicted_value: number, bet_amount: number) => {
       if (!connected || !account) {
-       toast.error("Connect your wallet")
+        toast.error("Connect your wallet");
         return null;
       }
 
@@ -113,7 +114,7 @@ export const useRangeContract = (connected: boolean, account: any) => {
         toast.error("Bet amount must be greater than zero");
         return null;
       }
-      console.log({pool_id,predicted_value,bet_amount})
+      console.log({ pool_id, predicted_value, bet_amount });
 
       const id = toast.loading("Placing bet...");
 
@@ -133,7 +134,7 @@ export const useRangeContract = (connected: boolean, account: any) => {
             entrypoint: "place_bet",
             calldata: CallData.compile({
               pool_id,
-              predicted_value:cairo.uint256(predicted_value),
+              predicted_value: cairo.uint256(predicted_value),
               bet_amount: cairo.uint256(bet_amount),
             }),
           },
@@ -154,7 +155,7 @@ export const useRangeContract = (connected: boolean, account: any) => {
 
         let betInfo = null;
         if (betPlacedEvent?.data) {
-          console.log(betPlacedEvent?.data)
+          console.log(betPlacedEvent?.data);
           betInfo = {
             poolId: betPlacedEvent.data[0]?.toString(),
             predictionId: betPlacedEvent.data[1]?.toString(),
@@ -164,6 +165,8 @@ export const useRangeContract = (connected: boolean, account: any) => {
           };
           console.log("Bet placed:", betInfo);
         }
+        await placeBetBackend(betPlacedEvent.data[2]?.toString(), txHash, "range-based");
+        console.log("Bet placed backend call successful");
 
         toast.success("Bet placed successfully!", { id });
         return { receipt, betInfo };

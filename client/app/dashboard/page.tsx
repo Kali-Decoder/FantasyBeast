@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { useRangeBased } from "../contexts/RangeBasedMarketProvider";
@@ -38,7 +39,7 @@ export default function DashboardPage() {
             </tr>
           </thead>
           <tbody>
-            {transactions.map((tx, idx) => (
+            {transactions.map((tx:any, idx:number) => (
               <tr
                 key={tx.trxHash}
                 className={idx % 2 === 0 ? "bg-black" : "bg-gray-500"}

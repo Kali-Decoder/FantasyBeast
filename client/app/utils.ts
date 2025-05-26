@@ -1,3 +1,5 @@
+import { postWithHeaders } from "./config";
+
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export function getRandomNumber() {
   return Math.floor(Math.random() * 1000000);
@@ -125,4 +127,26 @@ export function parseHexToNumber(hex: string) {
   if (!hex || hex === "0x") return 0;
   return parseInt(hex, 16);
 }
+
+export const placeBetBackend = async (address: any,trxHash: any,event: any) => {
+  try {
+    const url = "/transactions"; // or full path like "https://api.example.com/transactions"
+    
+    const data = {
+      trxHash: trxHash,
+      event: event, // or "binary-based", "create"
+      userAddress: address,
+    };
+
+    const headers = {
+        "x-user-address": address!,
+      };
+
+    const response = await postWithHeaders(url, data, headers);
+    console.log("Transaction response:", response.data);
+  } catch (err) {
+    console.error("Error placing bet:", err);
+    throw new Error("Failed to place bet. Please try again later.");
+  }
+};
 

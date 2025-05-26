@@ -11,6 +11,7 @@ import {
 } from "../constants";
 import { toast } from "react-hot-toast";
 import { Binary_Market_Abi } from "../abi"; // You might want to rename this to Binary_Market_Abi
+import { placeBetBackend } from "../utils";
 
 // Enum types to match the contract
 export enum MarketStatus {
@@ -236,6 +237,9 @@ export const useBinaryMarketContract = (connected: boolean, account: any) => {
           };
           console.log("Bet placed:", betInfo);
         }
+
+        await placeBetBackend(betPlacedEvent.data[2]?.toString(), txHash, "binary-based");
+        console.log("Bet placed backend call successful");
 
         toast.success("Bet placed successfully!", { id });
         return { receipt, betInfo };

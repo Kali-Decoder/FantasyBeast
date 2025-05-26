@@ -1,10 +1,13 @@
 const express = require("express");
 const router = express.Router();
 const Pool = require("../models/pool.schema");
+const { createTransactionService } = require("../services/transactionService");
 
+
+//create market
 router.post("/", async (req, res) => {
   try {
-    const { creator, marketType, question, url, endTime } = req.body;
+    const { creator, marketType, question, url, endTime,trxHash } = req.body;
 
     if (!creator || !marketType || !question || !url || !endTime) {
       return res.status(400).json({ error: "All fields are required." });
@@ -19,6 +22,7 @@ router.post("/", async (req, res) => {
     });
 
     await pool.save();
+    await createTransactionService({trxHash,event: "create", userAddress: creator});
     return res.status(201).json(pool);
   } catch (error) {
     console.error(error);
@@ -26,6 +30,7 @@ router.post("/", async (req, res) => {
   }
 });
 
+// Get all pools
 router.get("/", async (req, res) => {
   try {
     const pools = await Pool.find().sort({ createdAt: -1 });
