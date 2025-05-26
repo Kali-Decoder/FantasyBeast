@@ -5,7 +5,7 @@ export const ETH_TOKEN_ADDRESS =
 export const STRK_TOKEN_ADDRESS =
   "0x04718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d";
 export const RANGE_BASED_MARKET="0x60194e647730cdfa1c73a347434bfc59224e8ee92608b8811e2cf2f8ea7c98b"
-export const BINARY_BASED_MARKET="0x1aba545c908c9b1acd30b94fb847c43795c07ea1054d2e5b765c02925ea6d9e"
+export const BINARY_BASED_MARKET="0xefb269bd451cc2c5e51cdd94d53c4e0897ad14278bf8c8a04658f70a3777bd"
 export const voyagerScanBaseUrl = "https://sepolia.voyager.online";
 
 export const provider = new RpcProvider({
