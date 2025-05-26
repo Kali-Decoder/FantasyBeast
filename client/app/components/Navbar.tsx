@@ -10,12 +10,10 @@ import { useRangeBased } from "../contexts/RangeBasedMarketProvider";
 import { Activity, List } from "lucide-react";
 
 export function Navbar() {
-  const [searchFocused, setSearchFocused] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isCreateMarketModalOpen, setIsCreateMarketModalOpen] = useState(false); // Add this state
   const { userPoints } = useRangeBased();
   const { connect, connectors } = useConnect();
-  const { disconnect } = useDisconnect();
   const { address } = useAccount();
   const [username, setUsername] = useState<string | undefined>();
   const [connected, setConnected] = useState(false);

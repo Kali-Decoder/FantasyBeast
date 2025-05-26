@@ -11,7 +11,12 @@ import {
 } from "../constants";
 import { toast } from "react-hot-toast";
 import { Range_Market_Abi } from "../abi";
-import { createMarketBackend, parseHexToNumber, placeBetBackend, toSmallestUnit } from "../utils";
+import {
+  createMarketBackend,
+  parseHexToNumber,
+  placeBetBackend,
+  toSmallestUnit,
+} from "../utils";
 import { useAccount } from "@starknet-react/core";
 
 export const useRangeContract = (connected: boolean, account: any) => {
@@ -20,24 +25,22 @@ export const useRangeContract = (connected: boolean, account: any) => {
   useEffect(() => {
     if (account && !contractRef.current) {
       contractRef.current = new Contract(
-        Range_Market_Abi, 
+        Range_Market_Abi,
         RANGE_BASED_MARKET,
         account
       );
     }
   }, [account]);
 
-  
-
   const createPool = useCallback(
     async (
-
       postURL: string,
       question: string,
       start_time: number,
       end_time: number,
       max_bettors: number,
-      amount: number,      marketType:string
+      amount: number,
+      marketType: string
     ) => {
       if (!connected || !account) {
         console.warn("Not connected or account is missing");
@@ -51,17 +54,23 @@ export const useRangeContract = (connected: boolean, account: any) => {
 
       const id = toast.loading("Creating pool...");
 
-      console.log({ question, start_time, end_time, max_bettors, amount });
-
       try {
-        const _amount = (amount);
+        const _amount = amount;
+
+        console.log({
+          question,
+          start_time,
+          end_time,
+          max_bettors,
+          initial_stake: cairo.uint256(toSmallestUnit(_amount, 18)),
+        });
         const multiCall = await account.execute([
           {
             contractAddress: STRK_TOKEN_ADDRESS,
             entrypoint: "approve",
             calldata: CallData.compile({
               spender: RANGE_BASED_MARKET,
-              amount: cairo.uint256(toSmallestUnit(_amount,18)),
+              amount: cairo.uint256(_amount),
             }),
           },
           {
@@ -72,7 +81,7 @@ export const useRangeContract = (connected: boolean, account: any) => {
               start_time,
               end_time,
               max_bettors,
-              initial_stake: cairo.uint256(toSmallestUnit(_amount,18)),
+              initial_stake: cairo.uint256(_amount),
             }),
           },
         ]);
@@ -85,7 +94,6 @@ export const useRangeContract = (connected: boolean, account: any) => {
         const receipt = await provider.waitForTransaction(txHash);
         console.log("Create pool transaction receipt:", receipt);
 
-  
         const poolCreatedEvent = receipt?.events?.find(
           (e: { from_address: string }) => e.from_address === RANGE_BASED_MARKET
         );
@@ -106,7 +114,9 @@ export const useRangeContract = (connected: boolean, account: any) => {
           poolId
         );
 
-        toast.success("Pool created successfully! and you got 30 points", { id });
+        toast.success("Pool created successfully! and you got 30 points", {
+          id,
+        });
         return { receipt, poolId };
       } catch (err) {
         console.error("Create pool failed:", err);
@@ -131,19 +141,19 @@ export const useRangeContract = (connected: boolean, account: any) => {
       console.log({ pool_id, predicted_value, bet_amount });
 
       const id = toast.loading("Placing bet...");
-//       const betAmountHuman = 50.5;
-// const betAmountStr = toSmallestUnit(betAmountHuman, 18);
-// const betAmountUint256 = cairo.uint256(BigInt(betAmountStr));
+      //       const betAmountHuman = 50.5;
+      // const betAmountStr = toSmallestUnit(betAmountHuman, 18);
+      // const betAmountUint256 = cairo.uint256(BigInt(betAmountStr));
 
       try {
-        const _amount = (String(bet_amount));
+        const _amount = String(bet_amount);
         const multiCall = await account.execute([
           {
             contractAddress: STRK_TOKEN_ADDRESS,
             entrypoint: "approve",
             calldata: CallData.compile({
               spender: RANGE_BASED_MARKET,
-              amount: cairo.uint256(toSmallestUnit(_amount,18)),
+              amount: cairo.uint256(toSmallestUnit(_amount, 18)),
             }),
           },
           {
@@ -151,8 +161,10 @@ export const useRangeContract = (connected: boolean, account: any) => {
             entrypoint: "place_bet",
             calldata: CallData.compile({
               pool_id,
-              predicted_value: cairo.uint256(toSmallestUnit(String(predicted_value,),18)),
-              bet_amount: cairo.uint256(toSmallestUnit(_amount,18)),
+              predicted_value: cairo.uint256(
+                toSmallestUnit(String(predicted_value), 18)
+              ),
+              bet_amount: cairo.uint256(toSmallestUnit(_amount, 18)),
             }),
           },
         ]);
@@ -177,8 +189,10 @@ export const useRangeContract = (connected: boolean, account: any) => {
             poolId: betPlacedEvent.data[0]?.toString(),
             predictionId: betPlacedEvent.data[1]?.toString(),
             bettor: betPlacedEvent.data[2]?.toString(),
-            predictedValue: parseHexToNumber(betPlacedEvent.data[3]?.toString()),
-            betAmount:parseHexToNumber(betPlacedEvent.data[5]?.toString()),
+            predictedValue: parseHexToNumber(
+              betPlacedEvent.data[3]?.toString()
+            ),
+            betAmount: parseHexToNumber(betPlacedEvent.data[5]?.toString()),
           };
           console.log("Bet placed:", betInfo);
         }
