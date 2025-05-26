@@ -33,7 +33,6 @@ export function useRangeBased() {
   return context;
 }
 
-// Provider component
 export function RangeBasedProvider({ children }: RangeBasedProviderProps) {
   // State
   const { account, isConnected, address } = useAccount();
