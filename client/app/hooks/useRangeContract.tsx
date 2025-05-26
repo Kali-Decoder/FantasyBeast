@@ -18,10 +18,14 @@ import {
   toSmallestUnit,
 } from "../utils";
 import { useAccount } from "@starknet-react/core";
+import { useRangeBased } from "../contexts/RangeBasedMarketProvider";
 
 export const useRangeContract = (connected: boolean, account: any) => {
   const contractRef = useRef<Contract | null>(null);
   const { address } = useAccount();
+  const {  getLeaderboard,
+    getTransactionsHistory,
+    getPoints} = useRangeBased();
   useEffect(() => {
     if (account && !contractRef.current) {
       contractRef.current = new Contract(
@@ -117,6 +121,10 @@ export const useRangeContract = (connected: boolean, account: any) => {
         toast.success("Pool created successfully! and you got 30 points", {
           id,
         });
+
+        await getPoints();
+        await getTransactionsHistory();
+        await getLeaderboard();
         return { receipt, poolId };
       } catch (err) {
         console.error("Create pool failed:", err);
