@@ -66,10 +66,10 @@ const RangeMarketCard: React.FC<RangeMarketCardProps> = ({
       {/* Metric and TVL */}
       <div className="flex justify-between gap-2 text-sm font-semibold text-white mb-4">
         <div className="bg-black backdrop-blur-sm rounded-full px-3 py-1">
-          Metric: {fromSmallestUnit(market.metric,18)}
+          Metric: {(market.metric)}
         </div>
         <div className="bg-black backdrop-blur-sm rounded-full px-3 py-1">
-          TVL: {market.tvl} STRK
+          TVL: {fromSmallestUnit(market.tvl,18)} STRK
         </div>
       </div>
 
