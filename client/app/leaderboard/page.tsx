@@ -29,6 +29,7 @@ ${appUrl}
 
     return `https://twitter.com/intent/tweet?text=${tweetText}`;
   };
+  //hello
   return (
     <section className="py-12 px-6 w-full max-w-4xl mx-auto font-techno">
       <h2 className="text-3xl md:text-4xl font-bold mb-8 text-center text-white">
