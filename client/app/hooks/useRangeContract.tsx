@@ -70,7 +70,7 @@ export const useRangeContract = (connected: boolean, account: any) => {
             entrypoint: "approve",
             calldata: CallData.compile({
               spender: RANGE_BASED_MARKET,
-              amount: cairo.uint256(_amount),
+              amount: cairo.uint256(toSmallestUnit(_amount, 18)),
             }),
           },
           {
@@ -81,7 +81,7 @@ export const useRangeContract = (connected: boolean, account: any) => {
               start_time,
               end_time,
               max_bettors,
-              initial_stake: cairo.uint256(_amount),
+              initial_stake: cairo.uint256(toSmallestUnit(_amount, 18)),
             }),
           },
         ]);
