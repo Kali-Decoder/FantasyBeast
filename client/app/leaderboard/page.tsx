@@ -29,14 +29,13 @@ export default function LeaderboardTable() {
               <tr>
                 <th className="px-6 py-3">Rank</th>
                 <th className="px-6 py-3">Address</th>
-
                 <th className="px-6 py-3">Earned Points</th>
               </tr>
             </thead>
             <tbody className="bg-transparent">
               {leaderboardData.map((user, index) => (
                 <tr
-                  key={user.walletAddress}
+                  key={user?.walletAddress}
                   className={`border-b border-white/20 ${
                     index % 2 === 0 ? "bg-white/10" : "bg-white/5"
                   }`}
@@ -46,10 +45,10 @@ export default function LeaderboardTable() {
                   </td>
                   <td className="px-6 py-4">
                     <span className="text-blue-400">
-                      {user.walletAddress.slice(0, 6)}...{user.walletAddress.slice(-4)}
+                      {user?.walletAddress.slice(0, 6)}...{user?.walletAddress.slice(-4)}
                     </span>
                   </td>
-                  <td className="px-6 py-4">{user.xpPoints}</td>
+                  <td className="px-6 py-4">{user?.xpPoints}</td>
                 </tr>
               ))}
             </tbody>
