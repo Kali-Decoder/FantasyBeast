@@ -120,17 +120,18 @@ const RangeModal: React.FC<RangeModalProps> = ({
         </div>
 
         <div className="flex gap-2 mt-6">
-          <button
-            onClick={handleSubmit}
-            className="flex-1 bg-green-500 hover:bg-green-400 text-black font-bold py-2 px-4 rounded-xl border-2 border-black shadow-[3px_3px_0px_rgba(0,0,0,1)] active:translate-y-[2px] flex items-center justify-center"
-          >
-            Submit
-          </button>
+         
           <button
             onClick={onClose}
             className="flex-1 bg-red-500 hover:bg-red-400 text-black font-bold py-2 px-4 rounded-xl border-2 border-white shadow-[3px_3px_0px_rgba(1,1,1,1)] active:translate-y-[2px] flex items-center justify-center"
           >
             Close
+          </button>
+          <button
+            onClick={handleSubmit}
+            className="flex-1 bg-green-500 hover:bg-green-400 text-black font-bold py-2 px-4 rounded-xl border-2 border-black shadow-[3px_3px_0px_rgba(0,0,0,1)] active:translate-y-[2px] flex items-center justify-center"
+          >
+            Submit
           </button>
         </div>
       </div>

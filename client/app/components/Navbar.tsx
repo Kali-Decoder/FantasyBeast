@@ -75,6 +75,14 @@ export function Navbar() {
             </div>
             <button className="text-white text-base font-semibold">Create Market</button>
           </div>
+          <div 
+            className="flex items-center space-x-2 bg-gray-800 hover:bg-gray-700 px-4 py-2 rounded-full transition-colors cursor-pointer"
+          >
+            <div className="w-6 h-6 rounded-full flex items-center justify-center text-sm">
+              🌏
+            </div>
+            <Link href="/marketplace" className="text-white text-base font-semibold">Marketplace</Link>
+          </div>
           <div className="flex items-center space-x-2 bg-gray-800 hover:bg-gray-700 px-4 py-2 rounded-full transition-colors cursor-pointer">
             <div className="w-6 h-6 rounded-full bg-yellow-500 flex items-center justify-center text-sm">
               🪙
