@@ -192,3 +192,10 @@ export function toSmallestUnit(amount: number | string, decimals: number): strin
   const paddedFraction = (fractional + "0".repeat(decimals)).slice(0, decimals);
   return (whole + paddedFraction).replace(/^0+/, '') || "0";
 }
+
+export function fromSmallestUnit(amount: string | number, decimals: number): string {
+  const amtStr = amount.toString().padStart(decimals + 1, '0');
+  const whole = amtStr.slice(0, -decimals) || '0';
+  const fraction = amtStr.slice(-decimals).replace(/0+$/, ''); // remove trailing zeros
+  return fraction ? `${whole}.${fraction}` : whole;
+}
