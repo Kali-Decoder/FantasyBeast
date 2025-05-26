@@ -133,7 +133,9 @@ export default function CreateMarketModal({ onClose }: any) {
           resolutionTimestamp,
           parseInt(formData.maxBettors),
           parseFloat(formData.amount),
-          formData.initialPrediction
+          formData.initialPrediction,
+          formData.url,
+          marketType
         );
 
         console.log({ data });
@@ -257,18 +259,19 @@ export default function CreateMarketModal({ onClose }: any) {
         {/* Binary Specific Fields */}
         {marketType === "binary" && (
           <>
-            {/* <div>
-              <p className="text-sm mb-1 block">Description</p>
-              <textarea
-                name="description"
-                value={formData.description}
-                onChange={handleInputChange}
-                rows={2}
-                maxLength={300}
-                placeholder="Add more context for participants..."
-                className="w-full rounded-lg px-4 py-2 bg-gray-950 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
-              />
-            </div> */}
+               <div>
+          <p className="text-sm mb-1 block">Post Url</p>
+          <input
+            name="url"
+            type="url"
+            value={formData.url}
+            onChange={handleInputChange}
+            placeholder="https://x.com/itsNikku876/status/1923368642164523427"
+            className="w-full rounded-lg px-4 py-2 bg-gray-950 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+            required
+          />
+      
+        </div>
 
             <div>
               <p className="text-sm mb-1 block">Resolution Time</p>

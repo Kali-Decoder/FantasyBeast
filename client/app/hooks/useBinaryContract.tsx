@@ -11,7 +11,8 @@ import {
 } from "../constants";
 import { toast } from "react-hot-toast";
 import { Binary_Market_Abi } from "../abi"; // You might want to rename this to Binary_Market_Abi
-import { placeBetBackend } from "../utils";
+import { createMarketBackend, placeBetBackend } from "../utils";
+import { useAccount } from "@starknet-react/core";
 
 // Enum types to match the contract
 export enum MarketStatus {
@@ -55,6 +56,7 @@ export interface MarketWithId {
 
 export const useBinaryMarketContract = (connected: boolean, account: any) => {
   const contractRef = useRef<Contract | null>(null);
+  const { address } = useAccount();
 
   useEffect(() => {
     if (account && !contractRef.current) {
@@ -75,7 +77,9 @@ export const useBinaryMarketContract = (connected: boolean, account: any) => {
       resolution_time: number,
       max_bettors: number,
       initial_stake: number,
-      initial_prediction: Outcome
+      initial_prediction: Outcome,
+      postURL: string,
+      marketType: string
     ) => {
       if (!connected || !account) {
         toast.error("Connect your wallet");
@@ -152,7 +156,8 @@ export const useBinaryMarketContract = (connected: boolean, account: any) => {
 
         // Extract market creation event data
         const marketCreatedEvent = receipt?.events?.find(
-          (e: { from_address: string }) => e.from_address === BINARY_BASED_MARKET
+          (e: { from_address: string }) =>
+            e.from_address === BINARY_BASED_MARKET
         );
 
         let marketId = null;
@@ -161,7 +166,16 @@ export const useBinaryMarketContract = (connected: boolean, account: any) => {
           console.log("Market created with ID:", marketId);
         }
 
-        toast.success("Market created successfully!", { id });
+        await createMarketBackend(
+          address,
+          txHash,
+          marketType,
+          question,
+          postURL,
+          new Date(end_time * 1000)
+        );
+
+        toast.success("Market created successfully! and you get 30 point", { id });
         return { receipt, marketId };
       } catch (err) {
         console.error("Create market failed:", err);
@@ -220,7 +234,8 @@ export const useBinaryMarketContract = (connected: boolean, account: any) => {
 
         // Extract bet placement event data
         const betPlacedEvent = receipt?.events?.find(
-          (e: { from_address: string }) => e.from_address === BINARY_BASED_MARKET
+          (e: { from_address: string }) =>
+            e.from_address === BINARY_BASED_MARKET
         );
 
         let betInfo = null;
@@ -238,7 +253,11 @@ export const useBinaryMarketContract = (connected: boolean, account: any) => {
           console.log("Bet placed:", betInfo);
         }
 
-        await placeBetBackend(betPlacedEvent.data[2]?.toString(), txHash, "binary-based");
+        await placeBetBackend(
+          betPlacedEvent.data[2]?.toString(),
+          txHash,
+          "binary-based"
+        );
         console.log("Bet placed backend call successful");
 
         toast.success("Bet placed successfully!", { id });
@@ -283,7 +302,8 @@ export const useBinaryMarketContract = (connected: boolean, account: any) => {
 
         // Extract market resolution event data
         const marketResolvedEvent = receipt?.events?.find(
-          (e: { from_address: string }) => e.from_address === BINARY_BASED_MARKET
+          (e: { from_address: string }) =>
+            e.from_address === BINARY_BASED_MARKET
         );
 
         let resolutionInfo = null;
@@ -338,7 +358,8 @@ export const useBinaryMarketContract = (connected: boolean, account: any) => {
 
         // Extract reward claim event data
         const rewardClaimedEvent = receipt?.events?.find(
-          (e: { from_address: string }) => e.from_address === BINARY_BASED_MARKET
+          (e: { from_address: string }) =>
+            e.from_address === BINARY_BASED_MARKET
         );
 
         let rewardInfo = null;
@@ -387,7 +408,9 @@ export const useBinaryMarketContract = (connected: boolean, account: any) => {
     []
   );
 
-  const getAllMarkets = useCallback(async (): Promise<MarketWithId[] | null> => {
+  const getAllMarkets = useCallback(async (): Promise<
+    MarketWithId[] | null
+  > => {
     try {
       if (!binary_based_contract) {
         console.warn("Contract not available");
@@ -442,7 +465,9 @@ export const useBinaryMarketContract = (connected: boolean, account: any) => {
   );
 
   const getMarketOdds = useCallback(
-    async (market_id: number): Promise<{ yes_odds: bigint; no_odds: bigint } | null> => {
+    async (
+      market_id: number
+    ): Promise<{ yes_odds: bigint; no_odds: bigint } | null> => {
       try {
         if (!binary_based_contract) {
           console.warn("Contract not available");
@@ -513,15 +538,18 @@ export const useBinaryMarketContract = (connected: boolean, account: any) => {
     return outcome === Outcome.Yes ? "Yes" : "No";
   }, []);
 
-  const calculateProbability = useCallback((yesAmount: bigint, noAmount: bigint) => {
-    const total = yesAmount + noAmount;
-    if (total === BigInt(0)) return { yesProbability: 50, noProbability: 50 };
-    
-    const yesProbability = Number((yesAmount * BigInt(100)) / total);
-    const noProbability = 100 - yesProbability;
-    
-    return { yesProbability, noProbability };
-  }, []);
+  const calculateProbability = useCallback(
+    (yesAmount: bigint, noAmount: bigint) => {
+      const total = yesAmount + noAmount;
+      if (total === BigInt(0)) return { yesProbability: 50, noProbability: 50 };
+
+      const yesProbability = Number((yesAmount * BigInt(100)) / total);
+      const noProbability = 100 - yesProbability;
+
+      return { yesProbability, noProbability };
+    },
+    []
+  );
 
   return {
     // Write functions
@@ -529,7 +557,7 @@ export const useBinaryMarketContract = (connected: boolean, account: any) => {
     placeBet,
     resolveMarket,
     claimReward,
-    
+
     // Read functions
     getMarket,
     getAllMarkets,
@@ -537,13 +565,13 @@ export const useBinaryMarketContract = (connected: boolean, account: any) => {
     getBet,
     getMarketOdds,
     getUserBets,
-    
+
     // Utility functions
     formatMarketTime,
     getMarketStatusText,
     getOutcomeText,
     calculateProbability,
-    
+
     // Enums and types
     MarketStatus,
     Outcome,

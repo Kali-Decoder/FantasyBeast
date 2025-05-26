@@ -111,7 +111,7 @@ export const useRangeContract = (connected: boolean, account: any) => {
           new Date(end_time * 1000)
         );
 
-        toast.success("Pool created successfully!", { id });
+        toast.success("Pool created successfully! and you got 30 points", { id });
         return { receipt, poolId };
       } catch (err) {
         console.error("Create pool failed:", err);
