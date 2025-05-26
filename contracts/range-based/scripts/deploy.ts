@@ -20,8 +20,8 @@ async function main() {
   let sierraCode, casmCode;
 
   try {
-    // ({ sierraCode, casmCode } = await getCompiledCode("buzzify_Buzzify"));
-     ({ sierraCode, casmCode } = await getCompiledCode("buzzify_BinaryPredictionMarket"));
+    ({ sierraCode, casmCode } = await getCompiledCode("buzzify_Buzzify"));
+    //  ({ sierraCode, casmCode } = await getCompiledCode("buzzify_BinaryPredictionMarket"));
     
     // console.log({sierraCode,casmCode})
   } catch (error: any) {

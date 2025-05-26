@@ -1,3 +1,5 @@
+
+
 #[derive(Copy, Drop, Serde, starknet::Store, PartialEq)]
 #[allow(starknet::store_no_default_variant)]
 enum MarketStatus {
@@ -94,10 +96,12 @@ pub trait IBinaryPredictionMarket<TContractState> {
     fn claim_reward(ref self: TContractState, market_id: u32);
     fn get_market(self: @TContractState, market_id: u32) -> MarketInfo;
     fn get_bet(self: @TContractState, market_id: u32, bet_id: u32) -> BetInfo;
-    fn get_market_odds(self: @TContractState, market_id: u32) -> (u256, u256); // (yes_odds, no_odds)
+    fn get_market_odds(self: @TContractState, market_id: u32) -> (u256, u256);
     fn get_user_bets(self: @TContractState, market_id: u32, user: starknet::ContractAddress) -> Array<u32>;
     fn get_all_markets(self: @TContractState) -> Array<MarketWithId>;
     fn get_markets_count(self: @TContractState) -> u32;
+    fn get_owner(self: @TContractState) -> starknet::ContractAddress;
+    fn transfer_ownership(ref self: TContractState, new_owner: starknet::ContractAddress);
 }
 
 #[starknet::contract]
@@ -111,6 +115,8 @@ pub mod BinaryPredictionMarket {
 
     #[storage]
     struct Storage {
+        // Contract owner (deployer)
+        owner: ContractAddress,
         // Contract balance
         balance: u256,
         // Market management
@@ -135,6 +141,7 @@ pub mod BinaryPredictionMarket {
         BetPlaced: BetPlaced,
         MarketResolved: MarketResolved,
         RewardClaimed: RewardClaimed,
+        OwnershipTransferred: OwnershipTransferred,
     }
 
     #[derive(Drop, starknet::Event)]
@@ -178,6 +185,12 @@ pub mod BinaryPredictionMarket {
         reward_amount: u256,
     }
 
+    #[derive(Drop, starknet::Event)]
+    struct OwnershipTransferred {
+        previous_owner: ContractAddress,
+        new_owner: ContractAddress,
+    }
+
     // Constants
     const MAX_BETS: u64 = 10000; // Maximum number of bets per market
     const BASIS_POINTS: u16 = 10000; // 100% = 10000 basis points
@@ -188,6 +201,8 @@ pub mod BinaryPredictionMarket {
         self.strk_token.write(strk_token_address);
         self.protocol_fee.write(protocol_fee);
         self.markets_len.write(0);
+        // Set the deployer as the owner
+        self.owner.write(get_caller_address());
     }
 
     #[abi(embed_v0)]
@@ -348,7 +363,8 @@ pub mod BinaryPredictionMarket {
             assert(market.status == MarketStatus::Active, 'Market is not active');
 
             let caller = get_caller_address();
-            assert(caller == market.creator, 'Only creator can resolve');
+            let owner = self.owner.read();
+            assert(caller == owner, 'Only owner can resolve markets');
 
             let current_time = get_block_timestamp();
             assert(current_time >= market.resolution_time, 'Too early to resolve');
@@ -540,6 +556,26 @@ pub mod BinaryPredictionMarket {
 
         fn get_markets_count(self: @ContractState) -> u32 {
             self.markets_len.read()
+        }
+
+        fn get_owner(self: @ContractState) -> ContractAddress {
+            self.owner.read()
+        }
+
+        fn transfer_ownership(ref self: ContractState, new_owner: ContractAddress) {
+            let caller = get_caller_address();
+            let current_owner = self.owner.read();
+            assert(caller == current_owner, 'Not the owner');
+            
+            let previous_owner = current_owner;
+            self.owner.write(new_owner);
+            
+            self.emit(
+                OwnershipTransferred {
+                    previous_owner: previous_owner,
+                    new_owner: new_owner,
+                }
+            );
         }
     }
 
