@@ -89,8 +89,7 @@ const Address: React.FC<AddressProps> = ({ isMobile = false }) => {
                   title="Disconnect"
                 >
                   <LogOut size={14} />
-                  {/* OR use icon instead of text:
-                  <LogOut className="w-4 h-4" /> */}
+
                 </button>
               </>
             )}
