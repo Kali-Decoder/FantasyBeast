@@ -17,11 +17,17 @@ import { constants } from "starknet";
 
 import { ArgentMobileConnector } from "starknetkit/argentMobile";
 import { WebWalletConnector } from "starknetkit/webwallet";
-import { BINARY_BASED_MARKET, RANGE_BASED_MARKET } from "../constants";
+import { BINARY_BASED_MARKET, RANGE_BASED_MARKET, STRK_TOKEN_ADDRESS } from "../constants";
 
 
 const policies = {
   contracts: {
+    
+    [STRK_TOKEN_ADDRESS]: {
+      name: "STRK Token",
+      description: "Allows interaction with the STRK token contract",
+      methods: [{ name: "Approve", entrypoint: "approve", session: true }],
+    },
     [RANGE_BASED_MARKET]: {
       name: "Fantasy Beast",
       description: "Allows interaction with the Fantasy Beast Prediction",
