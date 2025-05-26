@@ -149,9 +149,6 @@ export const useRangeContract = (connected: boolean, account: any) => {
       console.log({ pool_id, predicted_value, bet_amount });
 
       const id = toast.loading("Placing bet...");
-      //       const betAmountHuman = 50.5;
-      // const betAmountStr = toSmallestUnit(betAmountHuman, 18);
-      // const betAmountUint256 = cairo.uint256(BigInt(betAmountStr));
 
       try {
         const _amount = String(bet_amount);
