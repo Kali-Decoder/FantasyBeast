@@ -206,6 +206,9 @@ export const useRangeContract = (connected: boolean, account: any) => {
           txHash,
           "range-based"
         );
+        await getPoints();
+        await getTransactionsHistory();
+        await getLeaderboard();
         console.log("Bet placed backend call successful");
 
         toast.success("Bet placed successfully!", { id });
@@ -260,6 +263,9 @@ export const useRangeContract = (connected: boolean, account: any) => {
           };
           console.log("Result set:", resultInfo);
         }
+        await getPoints();
+        await getTransactionsHistory();
+        await getLeaderboard();
 
         toast.success("Result set successfully!", { id });
         return { receipt, resultInfo };

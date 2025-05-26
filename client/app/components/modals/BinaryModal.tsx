@@ -35,8 +35,10 @@ const BinaryModal = ({ onClose, selectSingleBinaryMarket }) => {
     // You can call a function or API here to handle the bet submission
     console.log("Submitting bet of:", betAmount);
     console.log({selectSingleBinaryMarket})
+
+    const finalPrediction = selectSingleBinaryMarket.betStatus==="no" ? 1 : 0;
     // Example:
-  //  await  placeBet();
+    await  placeBet(selectSingleBinaryMarket?.market?.poolId,finalPrediction,Number(betAmount));
 
     onClose(); // optionally close modal on submit
   };

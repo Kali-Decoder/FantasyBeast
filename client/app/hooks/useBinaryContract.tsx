@@ -13,6 +13,7 @@ import { toast } from "react-hot-toast";
 import { Binary_Market_Abi } from "../abi"; // You might want to rename this to Binary_Market_Abi
 import { createMarketBackend, parseHexToNumber, placeBetBackend, toSmallestUnit } from "../utils";
 import { useAccount } from "@starknet-react/core";
+import { useRangeBased } from "../contexts/RangeBasedMarketProvider";
 
 // Enum types to match the contract
 export enum MarketStatus {
@@ -57,7 +58,9 @@ export interface MarketWithId {
 export const useBinaryMarketContract = (connected: boolean, account: any) => {
   const contractRef = useRef<Contract | null>(null);
   const { address } = useAccount();
-
+    const {  getLeaderboard,
+      getTransactionsHistory,
+      getPoints} = useRangeBased();
   useEffect(() => {
     if (account && !contractRef.current) {
       contractRef.current = new Contract(
@@ -175,7 +178,9 @@ export const useBinaryMarketContract = (connected: boolean, account: any) => {
           new Date(end_time * 1000),
           parseHexToNumber(marketId)
         );
-
+        await getPoints();
+        await getTransactionsHistory();
+        await getLeaderboard();
         toast.success("Market created successfully! and you get 30 point", { id });
         return { receipt, marketId };
       } catch (err) {
@@ -260,7 +265,9 @@ export const useBinaryMarketContract = (connected: boolean, account: any) => {
           "binary-based"
         );
         console.log("Bet placed backend call successful");
-
+        await getPoints();
+        await getTransactionsHistory();
+        await getLeaderboard();
         toast.success("Bet placed successfully!", { id });
         return { receipt, betInfo };
       } catch (err) {
@@ -317,7 +324,9 @@ export const useBinaryMarketContract = (connected: boolean, account: any) => {
           };
           console.log("Market resolved:", resolutionInfo);
         }
-
+        await getPoints();
+        await getTransactionsHistory();
+        await getLeaderboard();
         toast.success("Market resolved successfully!", { id });
         return { receipt, resolutionInfo };
       } catch (err) {
@@ -373,7 +382,9 @@ export const useBinaryMarketContract = (connected: boolean, account: any) => {
           };
           console.log("Reward claimed:", rewardInfo);
         }
-
+        await getPoints();
+        await getTransactionsHistory();
+        await getLeaderboard();
         toast.success("Reward claimed successfully!", { id });
         return { receipt, rewardInfo };
       } catch (err) {
